@@ -1,18 +1,28 @@
 // src/components/header/Header.jsx
 import React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const Header = ({ user, onLogout }) => {
+const Header = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Lógica de logout
+    navigate('/login');
+  };
+
+  const appBarStyle = {
+    backgroundColor: '#fff',
+    color: '#000',
+  };
+
   return (
-    <AppBar position="static">
+    <AppBar position="static" style={appBarStyle}>
       <Toolbar>
         <Typography variant="h6" style={{ flexGrow: 1 }}>
-          Bienvenido, {user.name}
+          Dashboard
         </Typography>
-        <Button color="inherit" onClick={onLogout}>Logout</Button>
+        <Button color="inherit" onClick={handleLogout}>Logout</Button>
       </Toolbar>
     </AppBar>
   );
