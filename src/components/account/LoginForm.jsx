@@ -1,8 +1,8 @@
 // src/components/account/LoginForm.jsx
 import React, { useState } from 'react';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
+import { Button, TextField, Box, Typography } from '@mui/material';
+import { FaUserCircle } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -14,40 +14,49 @@ const LoginForm = ({ onLogin }) => {
     onLogin(userData);
   };
 
+
   return (
     <Box
-      component="form"
-      onSubmit={handleSubmit}
-      sx={{
-        maxWidth: '400px',
-        margin: 'auto',
-        marginTop: '50px',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-      }}
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      minHeight="100vh"
     >
-      <TextField
-        label="Email"
-        variant="outlined"
-        fullWidth
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <TextField
-        label="Password"
-        type="password"
-        variant="outlined"
-        fullWidth
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <Button type="submit" variant="contained" color="primary" fullWidth>
-        Login
-      </Button>
+      <FaUserCircle size={100} style={{ color: '#3f0e40' }} />
+      <Typography variant="h4" gutterBottom>
+        Iniciar Sesión
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%', maxWidth: 360 }}>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="email"
+          label="Email"
+          name="email"
+          autoComplete="email"
+          autoFocus
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="password"
+          label="Contraseña"
+          type="password"
+          id="password"
+          autoComplete="current-password"
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2, backgroundColor: '#3f0e40' }}
+        >
+          Iniciar Sesión
+        </Button>
+      </Box>
     </Box>
   );
 };
