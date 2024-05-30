@@ -1,62 +1,53 @@
-// src/components/menu/Sidebar.jsx
 import React, { useState } from 'react';
-import { List, ListItem, ListItemText, Collapse, Drawer, Divider, ListItemIcon, Box, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { FaTachometerAlt, FaTasks, FaUsers, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import logo from '../../assets/logo.png'; // Asegúrate de que el logo esté en la carpeta correcta
+import { Link, useLocation } from 'react-router-dom';
+import { Dashboard, Assignment, Group, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
+import logo from '../../assets/logo.png'; 
 
 const Sidebar = () => {
-  const [openTasks, setOpenTasks] = useState(false);
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
 
-  const handleToggleTasks = () => {
-    setOpenTasks(!openTasks);
-  };
-
-  const drawerStyle = {
-    width: '240px',
-    backgroundColor: '#3f0e40',
-    color: '#fff',
-    height: '100vh',
-  };
-
-  const linkStyle = {
-    textDecoration: 'none',
-    color: 'inherit',
+  const handleClick = () => {
+    setOpen(!open);
   };
 
   return (
-    <Drawer variant="permanent" anchor="left" PaperProps={{ style: drawerStyle }}>
-      <Box display="flex" justifyContent="center" alignItems="center" p={2} style={{ backgroundColor: '#3f0e40' }}>
-        <img src={logo} alt="Company Logo" style={{ width: '80%', height: 'auto', backgroundColor: '#3f0e40' }} />
-      </Box>
-      <Divider style={{ backgroundColor: '#fff' }} />
+    <div style={{ width: '250px', background: '#4B0082', height: '100vh', color: 'white' }}>
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <img 
+          src={logo}
+          alt="Company Logo" 
+          style={{ width: '100px' }}
+        />
+      </div>
+      <Divider style={{ backgroundColor: 'white' }} />
       <List>
-        <ListItem button component={Link} to="/" style={linkStyle}>
-          <ListItemIcon style={{ color: '#fff' }}>
-            <FaTachometerAlt />
+        <ListItemButton component={Link} to="/dashboard" selected={location.pathname === '/dashboard'}>
+          <ListItemIcon>
+            <Dashboard style={{ color: 'white' }} />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
-        </ListItem>
-        <Divider style={{ backgroundColor: '#fff' }} />
-        <ListItem button onClick={handleToggleTasks} style={linkStyle}>
-          <ListItemIcon style={{ color: '#fff' }}>
-            <FaTasks />
+        </ListItemButton>
+        <ListItemButton onClick={handleClick}>
+          <ListItemIcon>
+            <Assignment style={{ color: 'white' }} />
           </ListItemIcon>
           <ListItemText primary="Tareas" />
-          {openTasks ? <FaChevronUp style={{ color: '#fff' }} /> : <FaChevronDown style={{ color: '#fff' }} />}
-        </ListItem>
-        <Collapse in={openTasks} timeout="auto" unmountOnExit>
+          {open ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+        </ListItemButton>
+        <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <ListItem button component={Link} to="/clients" style={{ ...linkStyle, paddingLeft: 32 }}>
-              <ListItemIcon style={{ color: '#fff' }}>
-                <FaUsers />
+            <ListItemButton sx={{ pl: 4 }} component={Link} to="/tareas/clientes" selected={location.pathname === '/tareas/clientes'}>
+              <ListItemIcon>
+                <Group style={{ color: 'white' }} />
               </ListItemIcon>
               <ListItemText primary="Clientes" />
-            </ListItem>
+            </ListItemButton>
           </List>
         </Collapse>
       </List>
-    </Drawer>
+    </div>
   );
 };
 

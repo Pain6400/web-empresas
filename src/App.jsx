@@ -23,7 +23,7 @@ function App() {
       {user ? (
         <div style={{ display: 'flex' }}>
           <Sidebar />
-          <div style={{ flexGrow: 1, marginLeft: '240px' }}>
+          <div style={{ flexGrow: 1 }}>
             <Header user={user} onLogout={handleLogout} />
             <div style={{ padding: '16px' }}>
               <Routes>
