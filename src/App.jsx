@@ -1,4 +1,4 @@
-import React, { useState, useContext  } from 'react';
+import React, { useState, useEffect  } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/menu/Sidebar';
 import Header from './components/menu/Header';
@@ -9,12 +9,24 @@ import Clients from './pages/Clients';
 import { UserProvider, UserContext } from './context/UserContext';
 
 function App() {
+  const [user, setUser] = useState(null);
 
-  const { user } = useContext(UserContext);
+  useEffect(() => {
+    const saveUser = localStorage.getItem('user');
+    if (saveUser) {
+      setUser(JSON.parse(saveUser));
+    }
+  }, [setUser]);
 
-  const PrivateRoute = ({ children }) => {
-    return user ? children : <Navigate to="/login" />;
-  };
+  const handleLogin = (userData) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(user);
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  }
 
   return (
     <UserProvider>
@@ -23,7 +35,7 @@ function App() {
           <div style={{ display: "flex" }}>
             <Sidebar />
             <div style={{ flexGrow: 1 }}>
-              <Header user={user} />
+              <Header user={user} onLogout={handleLogout} />
               <div style={{ padding: "16px" }}>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
@@ -36,7 +48,7 @@ function App() {
           </div>
         ) : (
           <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         )}

@@ -6,7 +6,6 @@ import api from '../../components/axiosConfig';
 import { UserContext } from '../../context/UserContext';
 
 const LoginForm = ({onLogin}) => {
-  const { login } = useContext(UserContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [empresaId, setEmpresaId] = useState('');
@@ -35,8 +34,7 @@ const LoginForm = ({onLogin}) => {
         const response = await api.post('/account/login', { usuario_id : username, password });
         const userInfo = { ...response.data.userInfo, empresa_id: empresaId };
         localStorage.setItem('token', response.data.tokenInfo.token);
-        localStorage.setItem('user', JSON.stringify(userInfo));
-        login(userInfo);
+        onLogin(userInfo)
         navigate('/dashboard');
       } catch (err) {
         setOpenSnackbar(true)
