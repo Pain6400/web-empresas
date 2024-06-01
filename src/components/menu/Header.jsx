@@ -1,15 +1,8 @@
 // src/components/header/Header.jsx
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
-const Header = (user) => {
-  const navigate = useNavigate();
-  console.log(user)
-  const handleLogout = () => {
-    // Lógica de logout
-    navigate('/login');
-  };
+const Header = ({user, onLogout}) => {
 
   const appBarStyle = {
     backgroundColor: '#fff',
@@ -27,7 +20,7 @@ const Header = (user) => {
             {user.name}
           </Typography>
         )}
-        <Button color="inherit" onClick={handleLogout}>Logout</Button>
+        <Button color="inherit" onClick={() => onLogout()}>Logout</Button>
       </Toolbar>
     </AppBar>
   );

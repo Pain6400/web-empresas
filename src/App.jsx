@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from 'react';
+import React, { useEffect, useContext   } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/menu/Sidebar';
 import Header from './components/menu/Header';
@@ -8,53 +8,63 @@ import Tasks from './pages/Tasks';
 import Clients from './pages/Clients';
 import { UserProvider, UserContext } from './context/UserContext';
 
-function App() {
-  const [user, setUser] = useState(null);
+
+const PrivateRoute = ({ children }) => {
+  const { user } = useContext(UserContext);
+  return user ? children : <Navigate to="/login" />;
+};
+
+const AppContent = () => {
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
-    const saveUser = localStorage.getItem('user');
-    if (saveUser) {
-      setUser(JSON.parse(saveUser));
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
     }
   }, [setUser]);
 
   const handleLogin = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
-    setUser(user);
-  }
+    setUser(userData);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
     setUser(null);
-  }
+  };
 
   return (
-    <UserProvider>
-      <Router>
-        {user ? (
-          <div style={{ display: "flex" }}>
-            <Sidebar />
-            <div style={{ flexGrow: 1 }}>
-              <Header user={user} onLogout={handleLogout} />
-              <div style={{ padding: "16px" }}>
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/tasks" element={<Tasks />} />
-                  <Route path="/clients" element={<Clients />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </div>
+    <Router>
+      {user ? (
+        <div style={{ display: 'flex' }}>
+          <Sidebar />
+          <div style={{ flexGrow: 1 }}>
+            <Header user={user} onLogout={handleLogout} />
+            <div style={{ padding: '16px' }}>
+              <Routes>
+                <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                <Route path="/tasks" element={<PrivateRoute><Tasks /></PrivateRoute>} />
+                <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
             </div>
           </div>
-        ) : (
-          <Routes>
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route path="*" element={<Navigate to="/login" />} />
-          </Routes>
-        )}
-      </Router>
-    </UserProvider>
+        </div>
+      ) : (
+        <Routes>
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      )}
+    </Router>
   );
-}
+};
+
+const App = () => (
+  <UserProvider>
+    <AppContent />
+  </UserProvider>
+);
 
 export default App;

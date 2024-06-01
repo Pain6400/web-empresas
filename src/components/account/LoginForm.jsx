@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext  } from 'react';
-import { Button, TextField, Container, Typography, Avatar, CssBaseline, Box, Snackbar, Alert,  MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react';
+import { Button, TextField, Container, Typography, Avatar, CssBaseline, Box, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
 import api from '../../components/axiosConfig';
 import { UserContext } from '../../context/UserContext';
 
-const LoginForm = ({onLogin}) => {
+const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [empresaId, setEmpresaId] = useState('');
@@ -14,7 +14,8 @@ const LoginForm = ({onLogin}) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const navigate = useNavigate();
-  
+  const { setUser } = useContext(UserContext);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = {};
@@ -29,26 +30,25 @@ const LoginForm = ({onLogin}) => {
       validationErrors.empresaId = 'Debe seleccionar una empresa';
     }
     if (Object.keys(validationErrors).length === 0) {
-      // Redirige al dashboard si no hay errores
       try {
-        const response = await api.post('/account/login', { usuario_id : username, password });
-        const userInfo = { ...response.data.userInfo, empresa_id: empresaId };
+        const response = await api.post('/account/login', { usuario_id: username, password });
         localStorage.setItem('token', response.data.tokenInfo.token);
-        onLogin(userInfo)
-        navigate('/dashboard');
+        const userData = { ...response.data.userInfo, empresa_id: empresaId };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        navigate('/'); // Redireccionar al dashboard
       } catch (err) {
-        setOpenSnackbar(true)
+        setOpenSnackbar(true);
         const response = err.response.data;
-        setSnackbarMessage(response.message)
+        setSnackbarMessage(response.message);
         console.error('Error logging in:', response);
       }
     } else {
-      // Actualiza los errores en el estado
       setErrors(validationErrors);
     }
   };
 
-  useEffect( () => {
+  useEffect(() => {
     const fetchEmpresas = async () => {
       try {
         const response = await api.get('/account/getEmpresas');
@@ -57,7 +57,6 @@ const LoginForm = ({onLogin}) => {
         console.error('Error fetching empresas:', error);
       }
     };
-
     fetchEmpresas();
   }, []);
 
