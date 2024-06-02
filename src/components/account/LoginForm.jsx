@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Button, TextField, Container, Typography, Avatar, CssBaseline, Box, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
-import api from '../../components/axiosConfig';
+import { LoadingProvider, LoadingContext } from '../../context/LoadingContext';
+import api, { setupInterceptors } from '../../components/axiosConfig';
 import { UserContext } from '../../context/UserContext';
-
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -15,6 +15,7 @@ const LoginForm = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
+  const { setIsLoading } = useContext(LoadingContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +32,7 @@ const LoginForm = () => {
     }
     if (Object.keys(validationErrors).length === 0) {
       try {
+        setupInterceptors(setIsLoading);
         const response = await api.post('/account/login', { usuario_id: username, password });
         localStorage.setItem('token', response.data.tokenInfo.token);
         const userData = { ...response.data.userInfo, empresa_id: empresaId };

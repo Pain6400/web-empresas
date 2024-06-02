@@ -6,10 +6,10 @@ import Login from './pages/account/login';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Clients from './pages/Clients';
-import { LoadingProvider } from './context/LoadingContext';
-import Loading from './components/Loading';
+import { LoadingProvider, LoadingContext } from './context/LoadingContext';
 import { UserProvider, UserContext } from './context/UserContext';
-
+import api, { setupInterceptors } from './components/axiosConfig';
+import Loading from './components/Loading';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useContext(UserContext);
@@ -18,13 +18,14 @@ const PrivateRoute = ({ children }) => {
 
 const AppContent = () => {
   const { user, setUser } = useContext(UserContext);
-
+  const { setIsLoading } = useContext(LoadingContext);
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
-  }, [setUser]);
+    setupInterceptors(setIsLoading);
+  }, [setUser, setIsLoading]);
 
   const handleLogin = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
