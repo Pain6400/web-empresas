@@ -6,6 +6,8 @@ import Login from './pages/account/login';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Clients from './pages/Clients';
+import { LoadingProvider } from './context/LoadingContext';
+import Loading from './components/Loading';
 import { UserProvider, UserContext } from './context/UserContext';
 
 
@@ -63,8 +65,10 @@ const AppContent = () => {
 
 const App = () => (
   <UserProvider>
-    <AppContent />
+    <LoadingProvider>
+      <Loading />
+      <AppContent />
+    </LoadingProvider>
   </UserProvider>
 );
-
 export default App;
