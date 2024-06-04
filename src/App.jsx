@@ -12,7 +12,7 @@ import Loading from './components/Loading';
 
 
 const PrivateRoute = ({ children }) => {
-  const { user } = useContext(UserContext);
+  const { user, setUser  } = useContext(UserContext);
   return user ? children : <Navigate to="/login" />;
 };
 

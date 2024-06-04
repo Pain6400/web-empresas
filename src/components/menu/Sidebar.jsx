@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useContext  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Dashboard, Assignment, Group, ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
 import logo from '../../assets/logo.png'; 
-
+import { UserContext } from '../../context/UserContext';
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { user } = useContext(UserContext);
+
+  const hasPermission = (requiredPermissions) => {
+    console.log(user.permissions)
+    if (!user || !user.permissions) return false;
+    console.log(user.permissions)
+    return requiredPermissions.every(permission => user.permissions.includes(permission));
+  };
 
   const handleClick = () => {
     setOpen(!open);
@@ -29,23 +37,29 @@ const Sidebar = () => {
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemButton>
-        <ListItemButton onClick={handleClick}>
-          <ListItemIcon>
-            <Assignment style={{ color: 'white' }} />
-          </ListItemIcon>
-          <ListItemText primary="Tareas" />
-          {open ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
-        </ListItemButton>
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }} component={Link} to="/tareas/clientes" selected={location.pathname === '/tareas/clientes'}>
+        {hasPermission(['Admin']) && (
+          <>
+            <ListItemButton onClick={handleClick}>
               <ListItemIcon>
-                <Group style={{ color: 'white' }} />
+                <Assignment style={{ color: 'white' }} />
               </ListItemIcon>
-              <ListItemText primary="Clientes" />
+              <ListItemText primary="Tareas" />
+              {open ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
             </ListItemButton>
-          </List>
-        </Collapse>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {hasPermission(['Cliente']) && (
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/tareas/clientes" selected={location.pathname === '/tareas/clientes'}>
+                    <ListItemIcon>
+                      <Group style={{ color: 'white' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Clientes" />
+                  </ListItemButton>
+                )}
+              </List>
+            </Collapse>
+          </>
+        )}
       </List>
     </div>
   );
