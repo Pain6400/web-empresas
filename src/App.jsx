@@ -1,4 +1,4 @@
-import React, { useEffect, useContext   } from 'react';
+import React, { useEffect, useContext, useState, createContext  } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/menu/Sidebar';
 import Header from './components/menu/Header';
@@ -6,10 +6,10 @@ import Login from './pages/account/login';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Clients from './pages/Clients';
-import { LoadingProvider, LoadingContext } from './context/LoadingContext';
 import { UserProvider, UserContext } from './context/UserContext';
-import api, { setupInterceptors } from './components/axiosConfig';
+import { LoadingProvider, LoadingContext } from './context/LoadingContext';
 import Loading from './components/Loading';
+
 
 const PrivateRoute = ({ children }) => {
   const { user } = useContext(UserContext);
@@ -18,14 +18,14 @@ const PrivateRoute = ({ children }) => {
 
 const AppContent = () => {
   const { user, setUser } = useContext(UserContext);
-  const { setIsLoading } = useContext(LoadingContext);
+  const { isLoading } = useContext(LoadingContext);
+
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
-    setupInterceptors(setIsLoading);
-  }, [setUser, setIsLoading]);
+  }, [setUser]);
 
   const handleLogin = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
@@ -60,6 +60,7 @@ const AppContent = () => {
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       )}
+      {isLoading && <Loading />}
     </Router>
   );
 };
@@ -67,9 +68,9 @@ const AppContent = () => {
 const App = () => (
   <UserProvider>
     <LoadingProvider>
-      <Loading />
       <AppContent />
     </LoadingProvider>
   </UserProvider>
 );
+
 export default App;

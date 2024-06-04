@@ -2,9 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Button, TextField, Container, Typography, Avatar, CssBaseline, Box, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
-import { LoadingProvider, LoadingContext } from '../../context/LoadingContext';
-import api, { setupInterceptors } from '../../components/axiosConfig';
+import api from '../../components/axiosConfig';
 import { UserContext } from '../../context/UserContext';
+import { LoadingContext } from '../../context/LoadingContext';
+
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -13,9 +14,10 @@ const LoginForm = () => {
   const [errors, setErrors] = useState({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
   const { setIsLoading } = useContext(LoadingContext);
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,7 +34,7 @@ const LoginForm = () => {
     }
     if (Object.keys(validationErrors).length === 0) {
       try {
-        setupInterceptors(setIsLoading);
+        setIsLoading(true);
         const response = await api.post('/account/login', { usuario_id: username, password });
         localStorage.setItem('token', response.data.tokenInfo.token);
         const userData = { ...response.data.userInfo, empresa_id: empresaId };
@@ -44,6 +46,8 @@ const LoginForm = () => {
         const response = err.response.data;
         setSnackbarMessage(response.message);
         console.error('Error logging in:', response);
+      } finally {
+        setIsLoading(false);
       }
     } else {
       setErrors(validationErrors);
@@ -51,16 +55,20 @@ const LoginForm = () => {
   };
 
   useEffect(() => {
-    const fetchEmpresas = async () => {
-      try {
-        const response = await api.get('/account/getEmpresas');
-        setEmpresas(response.data.empresas);
-      } catch (error) {
-        console.error('Error fetching empresas:', error);
-      }
-    };
     fetchEmpresas();
   }, []);
+
+  const fetchEmpresas = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get('/account/getEmpresas');
+      setEmpresas(response.data.empresas);
+    } catch (error) {
+      console.error('Error fetching empresas:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') {
