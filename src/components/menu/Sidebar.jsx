@@ -10,9 +10,9 @@ const Sidebar = () => {
   const { user } = useContext(UserContext);
 
   const hasPermission = (requiredPermissions) => {
-    console.log(user.permissions)
-    if (!user || !user.permissions) return false;
-    console.log(user.permissions)
+    if (!user || !user.permissions || user.permissions.length === 0) {
+      return false;
+    }
     return requiredPermissions.every(permission => user.permissions.includes(permission));
   };
 
@@ -37,7 +37,7 @@ const Sidebar = () => {
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemButton>
-        {hasPermission(['Admin']) && (
+        {hasPermission(['Cliente']) && (
           <>
             <ListItemButton onClick={handleClick}>
               <ListItemIcon>

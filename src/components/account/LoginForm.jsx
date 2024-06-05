@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Button, TextField, Container, Typography, Avatar, CssBaseline, Box, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'
 import api from '../../components/axiosConfig';
 import { UserContext } from '../../context/UserContext';
 import { LoadingContext } from '../../context/LoadingContext';
@@ -36,16 +37,31 @@ const LoginForm = () => {
       try {
         setIsLoading(true);
         const response = await api.post('/account/login', { usuario_id: username, password });
-        localStorage.setItem('token', response.data.tokenInfo.token);
-        const userData = { ...response.data.userInfo, empresa_id: empresaId };
+        const token = response.data.tokenInfo.token;
+        localStorage.setItem('token', token);
+        const decodedToken = jwtDecode(token); 
+        const userData = { 
+          ...response.data.userInfo, 
+          empresa_id: empresaId, 
+          roles: decodedToken.roles, 
+          permissions: decodedToken.permissions 
+        };
+
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
         navigate('/'); // Redireccionar al dashboard
       } catch (err) {
         setOpenSnackbar(true);
-        const response = err.response.data;
-        setSnackbarMessage(response.message);
-        console.error('Error logging in:', response);
+        console.log(err)
+        let response = err.response?.data ?? null;
+        if(response) {
+          setSnackbarMessage(response.message);
+          console.error('Error logging in:', response.message);
+        } else {
+          setSnackbarMessage(err);
+          console.error('Error logging in:', err);
+        }
+
       } finally {
         setIsLoading(false);
       }

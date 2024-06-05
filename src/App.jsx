@@ -12,7 +12,7 @@ import Loading from './components/Loading';
 
 
 const PrivateRoute = ({ children }) => {
-  const { user, setUser  } = useContext(UserContext);
+  const { user  } = useContext(UserContext);
   return user ? children : <Navigate to="/login" />;
 };
 
@@ -66,11 +66,11 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <UserProvider>
-    <LoadingProvider>
+  <LoadingProvider>
+    <UserProvider>
       <AppContent />
-    </LoadingProvider>
-  </UserProvider>
+    </UserProvider>
+  </LoadingProvider>
 );
 
 export default App;
