@@ -3,7 +3,7 @@ import React from 'react';
 import { Container, Box } from '@mui/material';
 import LoginForm from '../../components/account/LoginForm';
 
-const Login = ({onLogin}) => {
+const Login = () => {
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -13,7 +13,7 @@ const Login = ({onLogin}) => {
         justifyContent="center"
         minHeight="100vh"
       >
-        <LoginForm onLogin={onLogin} />
+        <LoginForm />
       </Box>
     </Container>
   );

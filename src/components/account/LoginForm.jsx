@@ -44,7 +44,8 @@ const LoginForm = () => {
           ...response.data.userInfo, 
           empresa_id: empresaId, 
           roles: decodedToken.roles, 
-          permissions: decodedToken.permissions 
+          permissions: decodedToken.permissions,
+          token  // Agregar el token a userData
         };
 
         setUser(userData);

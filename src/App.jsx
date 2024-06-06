@@ -9,7 +9,7 @@ import Clients from './pages/Clients';
 import { UserProvider, UserContext } from './context/UserContext';
 import { LoadingProvider, LoadingContext } from './context/LoadingContext';
 import Loading from './components/Loading';
-
+import { jwtDecode } from 'jwt-decode';
 
 const PrivateRoute = ({ children }) => {
   const { user  } = useContext(UserContext);
@@ -22,18 +22,42 @@ const AppContent = () => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        if (decodedToken.exp * 1000 < Date.now()) {
+          // Token expired
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          setUser(null);
+        } else {
+          // Token valid
+          if (savedUser) {
+            setUser(JSON.parse(savedUser));
+          }
+        }
+      } catch (error) {
+        // Invalid token
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        setUser(null);
+      }
+    } else {
+      setUser(null);
     }
   }, [setUser]);
 
   const handleLogin = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token); // Guarda el token aquí
     setUser(userData);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     setUser(null);
   };
 
