@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState, createContext  } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/menu/Sidebar';
 import Header from './components/menu/Header';
@@ -10,6 +10,8 @@ import { UserProvider, UserContext } from './context/UserContext';
 import { LoadingProvider, LoadingContext } from './context/LoadingContext';
 import Loading from './components/Loading';
 import { jwtDecode } from 'jwt-decode';
+import api from './components/axiosConfig';
+import GlobalAlert from './components/GlobalAlert';
 
 const PrivateRoute = ({ children }) => {
   const { user  } = useContext(UserContext);
@@ -18,8 +20,7 @@ const PrivateRoute = ({ children }) => {
 
 const AppContent = () => {
   const { user, setUser } = useContext(UserContext);
-  const { isLoading } = useContext(LoadingContext);
-
+  const { isLoading, setIsLoading } = useContext(LoadingContext);
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
@@ -43,6 +44,7 @@ const AppContent = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         setUser(null);
+        GlobalAlert.showError('Error', error);
       }
     } else {
       setUser(null);
@@ -55,10 +57,27 @@ const AppContent = () => {
     setUser(userData);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    setUser(null);
+  const handleLogout = async() => {
+    try {
+      setIsLoading(true);
+      const response = await api.post('/account/logout');
+      if (response.data.status) {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        setUser(null);
+      } else {
+        GlobalAlert.showError('Error loggout in:', response.data.message);
+      }
+    } catch (err) {
+      let response = err.response?.data ?? null;
+      if (response) {
+        GlobalAlert.showError('Error logging out:', response.data.message);
+      } else {
+        GlobalAlert.showError('Error logging out:', err.message || err.toString());
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

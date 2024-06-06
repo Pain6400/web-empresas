@@ -6,6 +6,7 @@ import { jwtDecode } from 'jwt-decode'
 import api from '../../components/axiosConfig';
 import { UserContext } from '../../context/UserContext';
 import { LoadingContext } from '../../context/LoadingContext';
+import GlobalAlert from '../../components/GlobalAlert';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -13,8 +14,6 @@ const LoginForm = () => {
   const [empresaId, setEmpresaId] = useState('');
   const [empresas, setEmpresas] = useState([]);
   const [errors, setErrors] = useState({});
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
   const { setUser } = useContext(UserContext);
   const { setIsLoading } = useContext(LoadingContext);
   const navigate = useNavigate();
@@ -52,14 +51,12 @@ const LoginForm = () => {
         localStorage.setItem('user', JSON.stringify(userData));
         navigate('/'); // Redireccionar al dashboard
       } catch (err) {
-        setOpenSnackbar(true);
-        console.log(err)
         let response = err.response?.data ?? null;
         if(response) {
-          setSnackbarMessage(response.message);
+          GlobalAlert.showError('Error logging in', response.message);
           console.error('Error logging in:', response.message);
         } else {
-          setSnackbarMessage(err);
+          GlobalAlert.showError('Error logging in', err);
           console.error('Error logging in:', err);
         }
 
@@ -81,18 +78,13 @@ const LoginForm = () => {
       const response = await api.get('/account/getEmpresas');
       setEmpresas(response.data.empresas);
     } catch (error) {
+      GlobalAlert.showError('Error fetching empresas', error);
       console.error('Error fetching empresas:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenSnackbar(false);
-  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -178,19 +170,6 @@ const LoginForm = () => {
           </Button>
         </Box>
       </Box>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </Container>
   );
 };
