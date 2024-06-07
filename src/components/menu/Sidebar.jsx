@@ -1,6 +1,6 @@
 import React, { useState, useContext  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Dashboard, Assignment, Group, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Dashboard, Assignment, Group, ExpandLess, ExpandMore, Settings } from '@mui/icons-material';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
 import logo from '../../assets/logo.png'; 
 import { UserContext } from '../../context/UserContext';
@@ -49,7 +49,7 @@ const Sidebar = () => {
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {hasPermission(['Cliente']) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/tareas/clientes" selected={location.pathname === '/tareas/clientes'}>
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/tasks" selected={location.pathname === '/tasks'}>
                     <ListItemIcon>
                       <Group style={{ color: 'white' }} />
                     </ListItemIcon>
@@ -60,6 +60,26 @@ const Sidebar = () => {
             </Collapse>
           </>
         )}
+        {/* Configuracion */}
+        <ListItemButton onClick={handleClick}>
+              <ListItemIcon>
+                <Settings style={{ color: 'white' }} />
+              </ListItemIcon>
+              <ListItemText primary="Configuracion" />
+              {open ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+            </ListItemButton>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {hasPermission(['Cliente']) && (
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/tareas/clientes" selected={location.pathname === '/tareas/clientes'}>
+                    <ListItemIcon>
+                      <Group style={{ color: 'white' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Clientes" />
+                  </ListItemButton>
+                )}
+              </List>
+            </Collapse>
       </List>
     </div>
   );
