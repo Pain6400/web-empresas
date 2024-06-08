@@ -95,7 +95,7 @@ const Sidebar = () => {
                     <ListItemIcon>
                       <Group style={{ color: 'white' }} />
                     </ListItemIcon>
-                    <ListItemText primary="Clientes" />
+                    <ListItemText primary="Configuracion" />
                   </ListItemButton>
                 )}
               </List>

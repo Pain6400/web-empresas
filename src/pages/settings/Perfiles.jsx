@@ -1,253 +1,160 @@
-import {
-    Container, Typography, Button, Table, TableBody, TableCell, TableHead,
-    TableRow, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-    TextField, IconButton, Select, MenuItem, InputLabel, FormControl
-  } from '@mui/material';
-  import { Edit, Delete } from '@mui/icons-material';
-  import axios from 'axios';
-  import GlobalAlert from '../components/GlobalAlert';  // Importa tu componente GlobalAlert
-  
-  const Perfiles = () => {
-    const [perfiles, setPerfiles] = useState([]);
-    const [usuarios, setUsuarios] = useState([]);
-    const [open, setOpen] = useState(false);
-    const [openAssociations, setOpenAssociations] = useState(false);
-    const [editingPerfil, setEditingPerfil] = useState(null);
-    const [newPerfil, setNewPerfil] = useState({ perfil_id: '', descripcion: '' });
-    const [selectedPerfil, setSelectedPerfil] = useState(null);
-    const [userProfile, setUserProfile] = useState({ usuario_id: '', perfil_id: '' });
-  
-    useEffect(() => {
-      fetchPerfiles();
-      fetchUsuarios();
-    }, []);
-  
-    const fetchPerfiles = async () => {
-      try {
-        const response = await axios.get('/api/perfiles');
-        setPerfiles(response.data);
-      } catch (error) {
-        GlobalAlert.showError('Error fetching profiles:', error.message);
+import React, { useState, useEffect } from 'react';
+import api from '../../components/axiosConfig';
+import { Button, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
+import GlobalAlert from '../../components/GlobalAlert';
+
+const Perfiles = () => {
+  const [perfiles, setPerfiles] = useState([]);
+  const [userProfiles, setUserProfiles] = useState([]);
+  const [newPerfil, setNewPerfil] = useState('');
+  const [editPerfilId, setEditPerfilId] = useState(null);
+  const [editPerfilDescripcion, setEditPerfilDescripcion] = useState('');
+
+  useEffect(() => {
+    fetchPerfiles();
+    fetchUserProfiles();
+  }, []);
+
+  const fetchPerfiles = async () => {
+    try {
+      const response = await api.get('/security/getPefiles');
+      if (Array.isArray(response.data.perfiles)) {
+        setPerfiles(response.data.perfiles);
+      } else {
+        GlobalAlert.showError('Error fetching profiles: Data is not an array');
       }
-    };
-  
-    const fetchUsuarios = async () => {
-      try {
-        const response = await axios.get('/api/usuarios');
-        setUsuarios(response.data);
-      } catch (error) {
-        GlobalAlert.showError('Error fetching users:', error.message);
+    } catch (error) {
+      let response = error.response?.data ?? null;
+      if(response) {
+        GlobalAlert.showError('Error fetching profiles', response.message);
+      } else {
+        GlobalAlert.showError('Error logging in', error);
       }
-    };
-  
-    const fetchUsuarioPerfiles = async (perfil_id) => {
-      try {
-        const response = await axios.get(`/api/usuarios_perfiles/${perfil_id}`);
-        setUserProfile(response.data);
-      } catch (error) {
-        GlobalAlert.showError('Error fetching user profiles:', error.message);
+    }
+  };
+
+  const fetchUserProfiles = async () => {
+    try {
+      const response = await api.get('/security/getUsuariosPefiles');
+      if (Array.isArray(response.data.usuariosPerfiles)) {
+        setUserProfiles(response.data.usuariosPerfiles);
+      } else {
+        GlobalAlert.showError('Error fetching user profiles: Data is not an array');
       }
-    };
-  
-    const handleClickOpen = (perfil = null) => {
-      setEditingPerfil(perfil);
-      setNewPerfil(perfil ? { ...perfil } : { perfil_id: '', descripcion: '' });
-      setOpen(true);
-    };
-  
-    const handleOpenAssociations = (perfil) => {
-      setSelectedPerfil(perfil);
-      fetchUsuarioPerfiles(perfil.perfil_id);
-      setOpenAssociations(true);
-    };
-  
-    const handleClose = () => {
-      setOpen(false);
-      setOpenAssociations(false);
-    };
-  
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setNewPerfil(prevState => ({
-        ...prevState,
-        [name]: value
-      }));
-      setUserProfile(prevState => ({
-        ...prevState,
-        [name]: value
-      }));
-    };
-  
-    const handleSave = async () => {
-      try {
-        if (editingPerfil) {
-          await axios.put(`/api/perfiles/${newPerfil.perfil_id}`, newPerfil);
-          GlobalAlert.showSuccess('Perfil actualizado exitosamente');
-        } else {
-          await axios.post('/api/perfiles', newPerfil);
-          GlobalAlert.showSuccess('Perfil creado exitosamente');
-        }
-        fetchPerfiles();
-        handleClose();
-      } catch (error) {
-        GlobalAlert.showError('Error saving profile:', error.message);
+    } catch (error) {
+      console.log(error)
+      let response = error.response?.data ?? null;
+      if(response) {
+        GlobalAlert.showError('Error fetching user profiles', response.message);
+      } else {
+        GlobalAlert.showError('Error logging in', error);
       }
-    };
-  
-    const handleSaveAssociation = async () => {
-      try {
-        await axios.post(`/api/usuarios_perfiles`, userProfile);
-        GlobalAlert.showSuccess('Usuario asociado exitosamente');
-        fetchUsuarioPerfiles(selectedPerfil.perfil_id);
-      } catch (error) {
-        GlobalAlert.showError('Error saving user profile association:', error.message);
-      }
-    };
-  
-    const handleDelete = async (perfil_id) => {
-      try {
-        await axios.delete(`/api/perfiles/${perfil_id}`);
-        GlobalAlert.showSuccess('Perfil eliminado exitosamente');
-        fetchPerfiles();
-      } catch (error) {
-        GlobalAlert.showError('Error deleting profile:', error.message);
-      }
-    };
-  
-    const handleDeleteAssociation = async (usuario_id, perfil_id) => {
-      try {
-        await axios.delete(`/api/usuarios_perfiles/${usuario_id}/${perfil_id}`);
-        GlobalAlert.showSuccess('Asociación eliminada exitosamente');
-        fetchUsuarioPerfiles(perfil_id);
-      } catch (error) {
-        GlobalAlert.showError('Error deleting user profile association:', error.message);
-      }
-    };
-  
-    return (
-      <Container>
-        <Typography variant="h4" gutterBottom>Gestión de Perfiles</Typography>
-        <Button variant="contained" color="primary" onClick={() => handleClickOpen()}>
-          Crear Perfil
-        </Button>
+    }
+  };
+
+  const handleAddPerfil = async () => {
+    try {
+      const response = await axios.post('/api/perfiles', { descripcion: newPerfil });
+      setPerfiles([...perfiles, response.data]);
+      setNewPerfil('');
+    } catch (error) {
+      GlobalAlert.showError('Error adding profile', error.message);
+    }
+  };
+
+  const handleDeletePerfil = async (perfilId) => {
+    try {
+      await axios.delete(`/api/perfiles/${perfilId}`);
+      setPerfiles(perfiles.filter(perfil => perfil.perfil_id !== perfilId));
+    } catch (error) {
+      GlobalAlert.showError('Error deleting profile', error.message);
+    }
+  };
+
+  const handleEditPerfil = async () => {
+    try {
+      const response = await axios.put(`/api/perfiles/${editPerfilId}`, { descripcion: editPerfilDescripcion });
+      setPerfiles(perfiles.map(perfil => (perfil.perfil_id === editPerfilId ? response.data : perfil)));
+      setEditPerfilId(null);
+      setEditPerfilDescripcion('');
+    } catch (error) {
+      GlobalAlert.showError('Error editing profile', error.message);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Perfiles</h1>
+      <div>
+        <TextField
+          label="Nuevo Perfil"
+          value={newPerfil}
+          onChange={(e) => setNewPerfil(e.target.value)}
+        />
+        <Button onClick={handleAddPerfil} variant="contained" color="primary">Agregar Perfil</Button>
+      </div>
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID del Perfil</TableCell>
+              <TableCell>Perfil ID</TableCell>
               <TableCell>Descripción</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {perfiles.map((perfil) => (
+            {Array.isArray(perfiles) && perfiles.map((perfil) => (
               <TableRow key={perfil.perfil_id}>
                 <TableCell>{perfil.perfil_id}</TableCell>
                 <TableCell>{perfil.descripcion}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" onClick={() => handleClickOpen(perfil)}>
+                  <IconButton onClick={() => {
+                    setEditPerfilId(perfil.perfil_id);
+                    setEditPerfilDescripcion(perfil.descripcion);
+                  }}>
                     <Edit />
                   </IconButton>
-                  <IconButton color="secondary" onClick={() => handleDelete(perfil.perfil_id)}>
+                  <IconButton onClick={() => handleDeletePerfil(perfil.perfil_id)}>
                     <Delete />
                   </IconButton>
-                  <Button variant="contained" color="default" onClick={() => handleOpenAssociations(perfil)}>
-                    Asociar Usuarios
-                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>{editingPerfil ? 'Editar Perfil' : 'Crear Perfil'}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {editingPerfil ? 'Actualiza la información del perfil.' : 'Ingrese la información del nuevo perfil.'}
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              name="perfil_id"
-              label="ID del Perfil"
-              type="text"
-              fullWidth
-              value={newPerfil.perfil_id}
-              onChange={handleChange}
-              disabled={editingPerfil !== null}
-            />
-            <TextField
-              margin="dense"
-              name="descripcion"
-              label="Descripción"
-              type="text"
-              fullWidth
-              value={newPerfil.descripcion}
-              onChange={handleChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="primary">Cancelar</Button>
-            <Button onClick={handleSave} color="primary">{editingPerfil ? 'Guardar Cambios' : 'Crear'}</Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={openAssociations} onClose={handleClose}>
-          <DialogTitle>Asociar Usuarios a {selectedPerfil?.descripcion}</DialogTitle>
-          <DialogContent>
-            <FormControl fullWidth margin="dense">
-              <InputLabel id="usuario-label">Usuario</InputLabel>
-              <Select
-                labelId="usuario-label"
-                name="usuario_id"
-                value={userProfile.usuario_id}
-                onChange={handleChange}
-              >
-                {usuarios.map((usuario) => (
-                  <MenuItem key={usuario.usuario_id} value={usuario.usuario_id}>
-                    {usuario.nombre}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              margin="dense"
-              name="perfil_id"
-              label="ID del Perfil"
-              type="text"
-              fullWidth
-              value={selectedPerfil?.perfil_id || ''}
-              disabled
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="primary">Cancelar</Button>
-            <Button onClick={handleSaveAssociation} color="primary">Asociar</Button>
-          </DialogActions>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID del Usuario</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Acciones</TableCell>
+      </TableContainer>
+      {editPerfilId && (
+        <div>
+          <TextField
+            label="Editar Descripción"
+            value={editPerfilDescripcion}
+            onChange={(e) => setEditPerfilDescripcion(e.target.value)}
+          />
+          <Button onClick={handleEditPerfil} variant="contained" color="primary">Guardar Cambios</Button>
+        </div>
+      )}
+      <h2>Usuarios Perfiles</h2>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Usuario ID</TableCell>
+              <TableCell>Perfil ID</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Array.isArray(userProfiles) && userProfiles.map((userProfile) => (
+              <TableRow key={`${userProfile.usuario_id}-${userProfile.perfil_id}`}>
+                <TableCell>{userProfile.usuario_id}</TableCell>
+                <TableCell>{userProfile.perfil_id}</TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {userProfile.map((association) => (
-                <TableRow key={association.usuario_id}>
-                  <TableCell>{association.usuario_id}</TableCell>
-                  <TableCell>{association.nombre}</TableCell>
-                  <TableCell>
-                    <IconButton color="secondary" onClick={() => handleDeleteAssociation(association.usuario_id, selectedPerfil.perfil_id)}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Dialog>
-      </Container>
-    );
-  };
-  
-  export default Perfiles;
-  
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  );
+};
+
+export default Perfiles;
