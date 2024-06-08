@@ -28,7 +28,7 @@ const Sidebar = () => {
     const pathToSectionMap = {
       '/tasks': 'tareas',
       '/tareas/clientes': 'tareas',
-      '/clients': 'configuracion',
+      '/configuracion/perfiles': 'configuracion',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -91,7 +91,7 @@ const Sidebar = () => {
             <Collapse in={openSections.configuracion} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {hasPermission(['Cliente']) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/tareas/clientes" selected={location.pathname === '/tareas/clientes'}>
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/configuracion/perfiles" selected={location.pathname === '/configuracion/perfiles'}>
                     <ListItemIcon>
                       <Group style={{ color: 'white' }} />
                     </ListItemIcon>
