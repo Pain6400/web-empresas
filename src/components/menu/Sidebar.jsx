@@ -1,11 +1,11 @@
-import React, { useState, useContext  } from 'react';
+import React, { useState, useContext, useEffect  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Dashboard, Assignment, Group, ExpandLess, ExpandMore, Settings } from '@mui/icons-material';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
 import logo from '../../assets/logo.png'; 
 import { UserContext } from '../../context/UserContext';
 const Sidebar = () => {
-  const [open, setOpen] = useState(false);
+  const [openSections, setOpenSections] = useState({});
   const location = useLocation();
   const { user } = useContext(UserContext);
 
@@ -16,10 +16,30 @@ const Sidebar = () => {
     return requiredPermissions.every(permission => user.permissions.includes(permission));
   };
 
-  const handleClick = () => {
-    setOpen(!open);
+  const handleClick = (section) => {
+    setOpenSections((prevOpenSections) => ({
+      ...prevOpenSections,
+      [section]: !prevOpenSections[section],
+    }));
   };
 
+  useEffect(() => {
+    // Define qué secciones deben estar abiertas en función de la ruta actual
+    const pathToSectionMap = {
+      '/tasks': 'tareas',
+      '/tareas/clientes': 'tareas',
+      '/clients': 'configuracion',
+      // Agrega más rutas y secciones según sea necesario
+    };
+
+    const sectionToOpen = pathToSectionMap[location.pathname];
+    if (sectionToOpen) {
+      setOpenSections((prevOpenSections) => ({
+        ...prevOpenSections,
+        [sectionToOpen]: true,
+      }));
+    }
+  }, [location.pathname]);
   return (
     <div style={{ width: '250px', background: '#4B0082', height: '100vh', color: 'white' }}>
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -39,14 +59,14 @@ const Sidebar = () => {
         </ListItemButton>
         {hasPermission(['Cliente']) && (
           <>
-            <ListItemButton onClick={handleClick}>
+            <ListItemButton onClick={() => handleClick('tareas')}>
               <ListItemIcon>
                 <Assignment style={{ color: 'white' }} />
               </ListItemIcon>
               <ListItemText primary="Tareas" />
-              {open ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+              {openSections.tareas ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
             </ListItemButton>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={openSections.tareas} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {hasPermission(['Cliente']) && (
                   <ListItemButton sx={{ pl: 4 }} component={Link} to="/tasks" selected={location.pathname === '/tasks'}>
@@ -61,14 +81,14 @@ const Sidebar = () => {
           </>
         )}
         {/* Configuracion */}
-        <ListItemButton onClick={handleClick}>
+        <ListItemButton onClick={() => handleClick('configuracion')}>
               <ListItemIcon>
                 <Settings style={{ color: 'white' }} />
               </ListItemIcon>
               <ListItemText primary="Configuracion" />
-              {open ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+              {openSections.configuracion ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
             </ListItemButton>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={openSections.configuracion} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {hasPermission(['Cliente']) && (
                   <ListItemButton sx={{ pl: 4 }} component={Link} to="/tareas/clientes" selected={location.pathname === '/tareas/clientes'}>
