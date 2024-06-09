@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../components/axiosConfig';
-import { Button, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Button, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 import GlobalAlert from '../../components/GlobalAlert';
+import ModalPerfil from '../../components/security/ModalPerfil';
+import ModalUsuarioPerfil from '../../components/security/ModalUsuarioPerfil';
 
 const Perfiles = () => {
   const [perfiles, setPerfiles] = useState([]);
   const [userProfiles, setUserProfiles] = useState([]);
-  const [newPerfil, setNewPerfil] = useState('');
-  const [editPerfilId, setEditPerfilId] = useState(null);
-  const [editPerfilDescripcion, setEditPerfilDescripcion] = useState('');
+  const [selectedPerfil, setSelectedPerfil] = useState(null);
+  const [selectedUsuarioPerfil, setSelectedUsuarioPerfil] = useState(null);
+  const [openPerfilModal, setOpenPerfilModal] = useState(false);
+  const [openUsuarioPerfilModal, setOpenUsuarioPerfilModal] = useState(false);
 
   useEffect(() => {
     fetchPerfiles();
@@ -53,48 +56,54 @@ const Perfiles = () => {
     }
   };
 
-  const handleAddPerfil = async () => {
-    try {
-      const response = await axios.post('/api/perfiles', { descripcion: newPerfil });
-      setPerfiles([...perfiles, response.data]);
-      setNewPerfil('');
-    } catch (error) {
-      GlobalAlert.showError('Error adding profile', error.message);
+  const handleSavePerfil = async (perfil) => {
+    if (selectedPerfil) {
+      // Edit
+      try {
+        const response = await api.put(`/api/perfiles/${selectedPerfil.perfil_id}`, perfil);
+        setPerfiles(perfiles.map(p => p.perfil_id === selectedPerfil.perfil_id ? response.data : p));
+        setOpenPerfilModal(false);
+      } catch (error) {
+        GlobalAlert.showError('Error editing profile', error.message);
+      }
+    } else {
+      // Create
+      try {
+        const response = await api.post('/api/perfiles', perfil);
+        setPerfiles([...perfiles, response.data]);
+        setOpenPerfilModal(false);
+      } catch (error) {
+        GlobalAlert.showError('Error adding profile', error.message);
+      }
     }
+  };
+
+  const handleSaveUsuarioPerfil = async (usuarioPerfil) => {
+    // Implement similar to handleSavePerfil
   };
 
   const handleDeletePerfil = async (perfilId) => {
     try {
-      await axios.delete(`/api/perfiles/${perfilId}`);
+      await api.delete(`/api/perfiles/${perfilId}`);
       setPerfiles(perfiles.filter(perfil => perfil.perfil_id !== perfilId));
     } catch (error) {
       GlobalAlert.showError('Error deleting profile', error.message);
     }
   };
 
-  const handleEditPerfil = async () => {
-    try {
-      const response = await axios.put(`/api/perfiles/${editPerfilId}`, { descripcion: editPerfilDescripcion });
-      setPerfiles(perfiles.map(perfil => (perfil.perfil_id === editPerfilId ? response.data : perfil)));
-      setEditPerfilId(null);
-      setEditPerfilDescripcion('');
-    } catch (error) {
-      GlobalAlert.showError('Error editing profile', error.message);
-    }
+  const handleDeleteUsuarioPerfil = async (usuarioId, perfilId) => {
+    // Implement similar to handleDeletePerfil
   };
 
   return (
     <div>
-      <h1>Perfiles</h1>
-      <div>
-        <TextField
-          label="Nuevo Perfil"
-          value={newPerfil}
-          onChange={(e) => setNewPerfil(e.target.value)}
-        />
-        <Button onClick={handleAddPerfil} variant="contained" color="primary">Agregar Perfil</Button>
-      </div>
-      <TableContainer component={Paper}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5">Manage Perfiles</Typography>
+        <Button variant="contained" color="primary" onClick={() => { setSelectedPerfil(null); setOpenPerfilModal(true); }}>
+          Add New Perfil
+        </Button>
+      </Box>
+      <TableContainer component={Paper} style={{ marginBottom: '2rem' }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -109,10 +118,7 @@ const Perfiles = () => {
                 <TableCell>{perfil.perfil_id}</TableCell>
                 <TableCell>{perfil.descripcion}</TableCell>
                 <TableCell>
-                  <IconButton onClick={() => {
-                    setEditPerfilId(perfil.perfil_id);
-                    setEditPerfilDescripcion(perfil.descripcion);
-                  }}>
+                  <IconButton onClick={() => { setSelectedPerfil(perfil); setOpenPerfilModal(true); }}>
                     <Edit />
                   </IconButton>
                   <IconButton onClick={() => handleDeletePerfil(perfil.perfil_id)}>
@@ -124,23 +130,20 @@ const Perfiles = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      {editPerfilId && (
-        <div>
-          <TextField
-            label="Editar Descripción"
-            value={editPerfilDescripcion}
-            onChange={(e) => setEditPerfilDescripcion(e.target.value)}
-          />
-          <Button onClick={handleEditPerfil} variant="contained" color="primary">Guardar Cambios</Button>
-        </div>
-      )}
-      <h2>Usuarios Perfiles</h2>
+
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5">Manage Usuarios Perfiles</Typography>
+        <Button variant="contained" color="primary" onClick={() => { setSelectedUsuarioPerfil(null); setOpenUsuarioPerfilModal(true); }}>
+          Add New Usuario Perfil
+        </Button>
+      </Box>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Usuario ID</TableCell>
               <TableCell>Perfil ID</TableCell>
+              <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -148,11 +151,32 @@ const Perfiles = () => {
               <TableRow key={`${userProfile.usuario_id}-${userProfile.perfil_id}`}>
                 <TableCell>{userProfile.usuario_id}</TableCell>
                 <TableCell>{userProfile.perfil_id}</TableCell>
+                <TableCell>
+                  <IconButton onClick={() => { setSelectedUsuarioPerfil(userProfile); setOpenUsuarioPerfilModal(true); }}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => handleDeleteUsuarioPerfil(userProfile.usuario_id, userProfile.perfil_id)}>
+                    <Delete />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <ModalPerfil
+        open={openPerfilModal}
+        handleClose={() => setOpenPerfilModal(false)}
+        handleSave={handleSavePerfil}
+        perfil={selectedPerfil}
+      />
+      <ModalUsuarioPerfil
+        open={openUsuarioPerfilModal}
+        handleClose={() => setOpenUsuarioPerfilModal(false)}
+        handleSave={handleSaveUsuarioPerfil}
+        usuarioPerfil={selectedUsuarioPerfil}
+      />
     </div>
   );
 };
