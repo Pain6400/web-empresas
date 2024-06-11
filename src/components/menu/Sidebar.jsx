@@ -81,21 +81,21 @@ const Sidebar = () => {
           </>
         )}
         {/* Configuracion */}
-        <ListItemButton onClick={() => handleClick('configuracion')}>
+        <ListItemButton onClick={() => handleClick('seguridad')}>
               <ListItemIcon>
                 <Settings style={{ color: 'white' }} />
               </ListItemIcon>
-              <ListItemText primary="Configuracion" />
+              <ListItemText primary="Seguridad" />
               {openSections.configuracion ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
             </ListItemButton>
             <Collapse in={openSections.configuracion} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {hasPermission(['Cliente']) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/configuracion/perfiles" selected={location.pathname === '/configuracion/perfiles'}>
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/configuracion/perfiles'}>
                     <ListItemIcon>
                       <Group style={{ color: 'white' }} />
                     </ListItemIcon>
-                    <ListItemText primary="Configuracion" />
+                    <ListItemText primary="Perfiles" />
                   </ListItemButton>
                 )}
               </List>

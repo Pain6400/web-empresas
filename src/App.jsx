@@ -6,7 +6,7 @@ import Login from './pages/account/login';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Clients from './pages/Clients';
-import Perfiles from './pages/settings/Perfiles';
+import Perfiles from './pages/security/Perfiles';
 import { UserProvider, UserContext } from './context/UserContext';
 import { LoadingProvider, LoadingContext } from './context/LoadingContext';
 import Loading from './components/Loading';
@@ -93,7 +93,7 @@ const AppContent = () => {
                 <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
                 <Route path="/tasks" element={<PrivateRoute><Tasks /></PrivateRoute>} />
                 <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
-                <Route path="/configuracion/perfiles" element={<PrivateRoute><Perfiles /></PrivateRoute>} />                
+                <Route path="/seguridad/perfiles" element={<PrivateRoute><Perfiles /></PrivateRoute>} />                
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>

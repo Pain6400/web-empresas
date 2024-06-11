@@ -97,7 +97,7 @@ const Perfiles = () => {
 
   return (
     <div>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5">Manage Perfiles</Typography>
         <Button variant="contained" color="primary" onClick={() => { setSelectedPerfil(null); setOpenPerfilModal(true); }}>
           Add New Perfil
@@ -131,7 +131,7 @@ const Perfiles = () => {
         </Table>
       </TableContainer>
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5">Manage Usuarios Perfiles</Typography>
         <Button variant="contained" color="primary" onClick={() => { setSelectedUsuarioPerfil(null); setOpenUsuarioPerfilModal(true); }}>
           Add New Usuario Perfil
