@@ -26,9 +26,8 @@ const Sidebar = () => {
   useEffect(() => {
     // Define qué secciones deben estar abiertas en función de la ruta actual
     const pathToSectionMap = {
-      '/tasks': 'tareas',
       '/tareas/clientes': 'tareas',
-      '/configuracion/perfiles': 'configuracion',
+      '/seguridad/perfiles': 'seguridad',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -86,12 +85,12 @@ const Sidebar = () => {
                 <Settings style={{ color: 'white' }} />
               </ListItemIcon>
               <ListItemText primary="Seguridad" />
-              {openSections.configuracion ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+              {openSections.seguridad ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
             </ListItemButton>
-            <Collapse in={openSections.configuracion} timeout="auto" unmountOnExit>
+            <Collapse in={openSections.seguridad} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {hasPermission(['Cliente']) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/configuracion/perfiles'}>
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/seguridad/perfiles'}>
                     <ListItemIcon>
                       <Group style={{ color: 'white' }} />
                     </ListItemIcon>
