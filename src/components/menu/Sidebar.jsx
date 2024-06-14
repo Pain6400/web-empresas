@@ -16,6 +16,13 @@ const Sidebar = () => {
     return requiredPermissions.every(permission => user.permissions.includes(permission));
   };
 
+  const hasRoles = (requiredRoles) => {
+    if (!user || !user.roles || user.roles.length === 0) {
+      return false;
+    }
+    return requiredRoles.every(rol => user.roles.includes(rol));
+  };
+
   const handleClick = (section) => {
     setOpenSections((prevOpenSections) => ({
       ...prevOpenSections,
@@ -56,7 +63,7 @@ const Sidebar = () => {
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemButton>
-        {hasPermission(['Cliente']) && (
+        {hasRoles(['Admin']) && (
           <>
             <ListItemButton onClick={() => handleClick('tareas')}>
               <ListItemIcon>
@@ -80,25 +87,30 @@ const Sidebar = () => {
           </>
         )}
         {/* Configuracion */}
-        <ListItemButton onClick={() => handleClick('seguridad')}>
-              <ListItemIcon>
-                <Settings style={{ color: 'white' }} />
-              </ListItemIcon>
-              <ListItemText primary="Seguridad" />
-              {openSections.seguridad ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
-            </ListItemButton>
-            <Collapse in={openSections.seguridad} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {hasPermission(['Cliente']) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/seguridad/perfiles'}>
-                    <ListItemIcon>
-                      <Group style={{ color: 'white' }} />
-                    </ListItemIcon>
-                    <ListItemText primary="Perfiles" />
-                  </ListItemButton>
-                )}
-              </List>
-            </Collapse>
+        {hasRoles(['Admin']) && (
+            <>
+              <ListItemButton onClick={() => handleClick('seguridad')}>
+                <ListItemIcon>
+                  <Settings style={{ color: 'white' }} />
+                </ListItemIcon>
+                <ListItemText primary="Seguridad" />
+                {openSections.seguridad ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+              </ListItemButton>
+              <Collapse in={openSections.seguridad} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {hasPermission(['Cliente']) && (
+                    <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/seguridad/perfiles'}>
+                      <ListItemIcon>
+                        <Group style={{ color: 'white' }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Perfiles" />
+                    </ListItemButton>
+                  )}
+                </List>
+              </Collapse>
+            </>
+          )
+        }
       </List>
     </div>
   );
