@@ -56,27 +56,6 @@ const Perfiles = () => {
     }
   };
 
-  const handleSavePerfil = async (perfil) => {
-    if (selectedPerfil) {
-      // Edit
-      try {
-        const response = await api.put(`/api/perfiles/${selectedPerfil.perfil_id}`, perfil);
-        setPerfiles(perfiles.map(p => p.perfil_id === selectedPerfil.perfil_id ? response.data : p));
-        setOpenPerfilModal(false);
-      } catch (error) {
-        GlobalAlert.showError('Error editing profile', error.message);
-      }
-    } else {
-      // Create
-      try {
-        const response = await api.post('/api/perfiles', perfil);
-        setPerfiles([...perfiles, response.data]);
-        setOpenPerfilModal(false);
-      } catch (error) {
-        GlobalAlert.showError('Error adding profile', error.message);
-      }
-    }
-  };
 
   const handleSaveUsuarioPerfil = async (usuarioPerfil) => {
     // Implement similar to handleSavePerfil
@@ -98,9 +77,9 @@ const Perfiles = () => {
   return (
     <div>
       <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Manage Perfiles</Typography>
+        <Typography variant="h5">Perfiles</Typography>
         <Button variant="contained" color="primary" onClick={() => { setSelectedPerfil(null); setOpenPerfilModal(true); }}>
-          Add New Perfil
+          Crear
         </Button>
       </Box>
       <TableContainer component={Paper} style={{ marginBottom: '2rem' }}>
@@ -132,9 +111,9 @@ const Perfiles = () => {
       </TableContainer>
 
       <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Manage Usuarios Perfiles</Typography>
+        <Typography variant="h5">Usuarios Perfiles</Typography>
         <Button variant="contained" color="primary" onClick={() => { setSelectedUsuarioPerfil(null); setOpenUsuarioPerfilModal(true); }}>
-          Add New Usuario Perfil
+          Crear
         </Button>
       </Box>
       <TableContainer component={Paper}>
@@ -168,13 +147,11 @@ const Perfiles = () => {
       <ModalPerfil
         open={openPerfilModal}
         handleClose={() => setOpenPerfilModal(false)}
-        handleSave={handleSavePerfil}
         perfil={selectedPerfil}
       />
       <ModalUsuarioPerfil
         open={openUsuarioPerfilModal}
         handleClose={() => setOpenUsuarioPerfilModal(false)}
-        handleSave={handleSaveUsuarioPerfil}
         usuarioPerfil={selectedUsuarioPerfil}
       />
     </div>

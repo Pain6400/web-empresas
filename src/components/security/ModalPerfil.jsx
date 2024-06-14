@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button } from '@mui/material';
+import api from '../../components/axiosConfig';
 
 const style = {
   position: 'absolute',
@@ -13,17 +14,37 @@ const style = {
   p: 4,
 };
 
-const ModalPerfil = ({ open, handleClose, handleSave, perfil }) => {
+const ModalPerfil = ({ open, handleClose, perfil }) => {
   const [descripcion, setDescripcion] = useState('');
 
+  
   useEffect(() => {
     if (perfil) {
       setDescripcion(perfil.descripcion);
     }
   }, [perfil]);
 
-  const handleSubmit = () => {
-    handleSave({ ...perfil, descripcion });
+  const handleSubmit = async () => {
+    if (perfil) {
+      // Edit
+      try {
+        const response = await api.put(`/api/perfiles/${perfil.perfil_id}`, perfil);
+        setPerfiles(perfiles.map(p => p.perfil_id === perfil.perfil_id ? response.data : p));
+        setOpenPerfilModal(false);
+      } catch (error) {
+        GlobalAlert.showError('Error editing profile', error.message);
+      }
+    } else {
+      // Create
+      try {
+        const response = await api.post('/api/perfiles', perfil);
+        setPerfiles([...perfiles, response.data]);
+        setOpenPerfilModal(false);
+      } catch (error) {
+        GlobalAlert.showError('Error adding profile', error.message);
+      }
+    }
+
     handleClose();
   };
 
