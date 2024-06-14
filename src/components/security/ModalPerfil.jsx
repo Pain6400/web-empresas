@@ -28,16 +28,20 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
     if (perfil) {
       // Edit
       try {
-        const response = await api.put(`/api/perfiles/${perfil.perfil_id}`, perfil);
-        setPerfiles(perfiles.map(p => p.perfil_id === perfil.perfil_id ? response.data : p));
+        const response = await api.put(`/security/createPefil/${perfil.perfil_id}`, perfil);
         setOpenPerfilModal(false);
       } catch (error) {
-        GlobalAlert.showError('Error editing profile', error.message);
+        let response = error.response?.data ?? null;
+        if(response) {
+          GlobalAlert.showError('Error: ', response.message);
+        } else {
+          GlobalAlert.showError('Error: ', error);
+        }
       }
     } else {
       // Create
       try {
-        const response = await api.post('/api/perfiles', perfil);
+        const response = await api.post('/security/createPefil/', perfil);
         setPerfiles([...perfiles, response.data]);
         setOpenPerfilModal(false);
       } catch (error) {

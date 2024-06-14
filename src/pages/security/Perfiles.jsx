@@ -17,7 +17,7 @@ const Perfiles = () => {
   useEffect(() => {
     fetchPerfiles();
     fetchUserProfiles();
-  }, []);
+  }, [userProfiles]);
 
   const fetchPerfiles = async () => {
     try {
