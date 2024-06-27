@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button } from '@mui/material';
+import { Modal, Box, TextField, Button, Divider } from '@mui/material';
 import api from '../../components/axiosConfig';
 
 const style = {
@@ -7,26 +7,36 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 600,
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
-  p: 4,
+  p: 3,
 };
 
 const ModalPerfil = ({ open, handleClose, perfil }) => {
+  const [perfil_id, setPerfil_id] = useState('');
   const [descripcion, setDescripcion] = useState('');
-
+  const [errors, setErrors] = useState({});
   
   useEffect(() => {
     if (perfil) {
+      setPerfil_id(perfil.perfil_id)
       setDescripcion(perfil.descripcion);
     }
   }, [perfil]);
 
   const handleSubmit = async () => {
-    if (perfil) {
-      // Edit
+    const validationErrors = {};
+
+    if (!perfil_id) {
+      validationErrors.perfil_id = 'El usuario es obligatorio';
+    }
+    if (!descripcion) {
+      validationErrors.descripcion = 'La contraseña es obligatoria';
+    }
+
+    if (Object.keys(validationErrors).length === 0) {
       try {
         const response = await api.put(`/security/createPefil/${perfil.perfil_id}`, perfil);
         setOpenPerfilModal(false);
@@ -38,29 +48,36 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
           GlobalAlert.showError('Error: ', error);
         }
       }
+      handleClose();
     } else {
-      // Create
-      try {
-        const response = await api.post('/security/createPefil/', perfil);
-        setPerfiles([...perfiles, response.data]);
-        setOpenPerfilModal(false);
-      } catch (error) {
-        GlobalAlert.showError('Error adding profile', error.message);
-      }
+      setErrors(validationErrors);
     }
-
-    handleClose();
   };
 
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <h2>{perfil ? 'Editar Perfil' : 'Nuevo Perfil'}</h2>
+        <h3>{perfil ? 'Editar Perfil' : 'Nuevo Perfil'}</h3>
+        <Divider  />
+
+        <TextField
+          label="Perfil Id"
+          value={perfil_id}
+          onChange={(e) => setPerfil_id(e.target.value)}
+          fullWidth
+          error={Boolean(errors.perfil_id)}
+          helperText={errors.perfil_id}
+          sx={{ mt: 2 }}
+        />
+
         <TextField
           label="Descripción"
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
           fullWidth
+          error={Boolean(errors.descripcion)}
+          helperText={errors.descripcion}
+          sx={{ mt: 2 }}
         />
         <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ mt: 2 }}>
           Guardar

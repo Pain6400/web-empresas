@@ -1,6 +1,6 @@
 // src/axiosConfig.js
 import axios from 'axios';
-import { setLoadingFunction } from '../context/LoadingContext';
+//import { setLoadingFunction } from '../context/LoadingContext';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -12,22 +12,23 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  setLoadingFunction(true);
+  //setLoadingFunction(true);
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+ // setLoadingFunction(false);
   return config;
 }, (error) => {
-  setLoadingFunction(false);
+  //setLoadingFunction(false);
   return Promise.reject(error);
 });
 
 api.interceptors.response.use((response) => {
-  setLoadingFunction(false);
+  //setLoadingFunction(false);
   return response;
 }, (error) => {
-  setLoadingFunction(false);
+ //setLoadingFunction(false);
   return Promise.reject(error);
 });
 
