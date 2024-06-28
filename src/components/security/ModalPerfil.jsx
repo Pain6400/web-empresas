@@ -24,6 +24,9 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
     if (perfil) {
       setPerfil_id(perfil.perfil_id)
       setDescripcion(perfil.descripcion);
+    } else {
+      setPerfil_id('');
+      setDescripcion('');
     }
   }, [perfil]);
 
@@ -39,11 +42,18 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await api.put(`/security/createPefil`, {
+        let path = perfil ? '/security/UpdatePefil' : '/security/createPefil'
+        console.log(path)
+        const response = await api.post(path, {
           perfil_id,
           descripcion
-        }, perfil);
-        setOpenPerfilModal(false);
+        });
+
+        if(response.data.status) {
+          handleClose();
+        } else {
+          GlobalAlert.showError('Error: ', response.data.message);
+        }
       } catch (error) {
         let response = error.response?.data ?? null;
         if(response) {
@@ -52,7 +62,6 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
           GlobalAlert.showError('Error: ', error);
         }
       }
-      handleClose();
     } else {
       setErrors(validationErrors);
     }
@@ -65,6 +74,7 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
         <Divider  />
 
         <TextField
+          disabled={Boolean(perfil)}
           label="Perfil Id"
           value={perfil_id}
           onChange={(e) => setPerfil_id(e.target.value)}
