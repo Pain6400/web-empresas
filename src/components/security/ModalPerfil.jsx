@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button, Divider } from '@mui/material';
 import api from '../../components/axiosConfig';
+import GlobalAlert from '../../components/GlobalAlert';
 
 const style = {
   position: 'absolute',
@@ -38,7 +39,10 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await api.put(`/security/createPefil/${perfil.perfil_id}`, perfil);
+        const response = await api.put(`/security/createPefil`, {
+          perfil_id,
+          descripcion
+        }, perfil);
         setOpenPerfilModal(false);
       } catch (error) {
         let response = error.response?.data ?? null;
