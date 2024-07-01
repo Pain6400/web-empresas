@@ -43,7 +43,6 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         let path = perfil ? '/security/UpdatePefil' : '/security/createPefil'
-        console.log(path)
         const response = await api.post(path, {
           perfil_id,
           descripcion

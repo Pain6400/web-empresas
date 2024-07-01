@@ -61,13 +61,20 @@ const Perfiles = () => {
     // Implement similar to handleSavePerfil
   };
 
-  const handleDeletePerfil = async (perfilId) => {
-    try {
-      await api.delete(`/api/perfiles/${perfilId}`);
-      setPerfiles(perfiles.filter(perfil => perfil.perfil_id !== perfilId));
-    } catch (error) {
-      GlobalAlert.showError('Error deleting profile', error.message);
-    }
+  const handleDeletePerfil = async (perfil_id) => {
+    GlobalAlert.showWarning(
+      'Eliminar registro', 
+      'Esta seguro en eliminar el registro?',
+      async () => {
+        try {
+          await api.post(`/security/DeletePefil/${perfil_id}`);
+          setPerfiles(perfiles.filter(perfil => perfil.perfil_id !== perfil_id));
+          GlobalAlert.showSuccess('Profile deleted successfully');
+        } catch (error) {
+          GlobalAlert.showError('Error deleting profile', error.message);
+        }
+      }  
+    )
   };
 
   const handleDeleteUsuarioPerfil = async (usuarioId, perfilId) => {
@@ -131,9 +138,6 @@ const Perfiles = () => {
                 <TableCell>{userProfile.usuario_id}</TableCell>
                 <TableCell>{userProfile.perfil_id}</TableCell>
                 <TableCell>
-                  <IconButton onClick={() => { setSelectedUsuarioPerfil(userProfile); setOpenUsuarioPerfilModal(true); }}>
-                    <Edit />
-                  </IconButton>
                   <IconButton onClick={() => handleDeleteUsuarioPerfil(userProfile.usuario_id, userProfile.perfil_id)}>
                     <Delete />
                   </IconButton>

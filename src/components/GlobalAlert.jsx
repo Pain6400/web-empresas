@@ -16,11 +16,18 @@ const GlobalAlert = {
       text: text || 'Operation completed successfully!',
     });
   },
-  showWarning: (title, text) => {
+  showWarning: (title, text, onConfirm) => {
     Swal.fire({
       icon: 'warning',
       title: title || 'Warning',
       text: text || 'Please be cautious!',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed && onConfirm) {
+        onConfirm();
+      }
     });
   },
   // Add more methods if needed
