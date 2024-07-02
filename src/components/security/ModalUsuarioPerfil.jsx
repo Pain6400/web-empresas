@@ -45,6 +45,7 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil }) => {
 
         if(response.data.status) {
           handleClose();
+          GlobalAlert.showSuccess('Registro creado correctamente');
         } else {
           GlobalAlert.showError('Error: ', response.data.message);
         }

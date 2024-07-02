@@ -57,9 +57,6 @@ const Perfiles = () => {
   };
 
 
-  const handleSaveUsuarioPerfil = async (usuarioPerfil) => {
-    // Implement similar to handleSavePerfil
-  };
 
   const handleDeletePerfil = async (perfil_id) => {
     GlobalAlert.showWarning(
@@ -69,7 +66,7 @@ const Perfiles = () => {
         try {
           await api.post(`/security/DeletePefil/${perfil_id}`);
           setPerfiles(perfiles.filter(perfil => perfil.perfil_id !== perfil_id));
-          GlobalAlert.showSuccess('Profile deleted successfully');
+          GlobalAlert.showSuccess('Registro eliminado correctamente');
         } catch (error) {
           GlobalAlert.showError('Error deleting profile', error.message);
         }
@@ -78,7 +75,19 @@ const Perfiles = () => {
   };
 
   const handleDeleteUsuarioPerfil = async (usuarioId, perfilId) => {
-    // Implement similar to handleDeletePerfil
+    GlobalAlert.showWarning(
+      'Eliminar registro', 
+      'Esta seguro en eliminar el registro?',
+      async () => {
+        try {
+          await api.post(`/security/DeleteUsuarioPefil/${perfilId}/${usuarioId}`);
+          setPerfiles(perfiles.filter(perfil => perfil.perfil_id !== perfilId && perfil.usuario_id !== usuarioId));
+          GlobalAlert.showSuccess('Registro eliminado correctamente');
+        } catch (error) {
+          GlobalAlert.showError('Error deleting profile', error.message);
+        }
+      }  
+    )
   };
 
   return (

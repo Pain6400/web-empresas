@@ -50,6 +50,7 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
 
         if(response.data.status) {
           handleClose();
+          GlobalAlert.showSuccess('Registro creado correctamente');
         } else {
           GlobalAlert.showError('Error: ', response.data.message);
         }
