@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import api from '../../components/axiosConfig';
 import { Button, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 import GlobalAlert from '../../components/GlobalAlert';
 import ModalPerfil from '../../components/security/ModalPerfil';
 import ModalUsuarioPerfil from '../../components/security/ModalUsuarioPerfil';
+import { LoadingContext } from '../../context/LoadingContext';
 
 const Perfiles = () => {
   const [perfiles, setPerfiles] = useState([]);
@@ -13,13 +14,14 @@ const Perfiles = () => {
   const [selectedUsuarioPerfil, setSelectedUsuarioPerfil] = useState(null);
   const [openPerfilModal, setOpenPerfilModal] = useState(false);
   const [openUsuarioPerfilModal, setOpenUsuarioPerfilModal] = useState(false);
-
+  const { setIsLoading } = useContext(LoadingContext);
   useEffect(() => {
     fetchPerfiles();
     fetchUserProfiles();
-  }, [userProfiles]);
+  }, []);
 
   const fetchPerfiles = async () => {
+    setIsLoading(true)
     try {
       const response = await api.get('/security/getPefiles');
       if (Array.isArray(response.data.perfiles)) {
@@ -53,6 +55,8 @@ const Perfiles = () => {
       } else {
         GlobalAlert.showError('Error logging in', error);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
