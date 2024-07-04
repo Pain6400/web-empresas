@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Modal, Box, TextField, Button, Divider } from '@mui/material';
 import api from '../../components/axiosConfig';
 import GlobalAlert from '../../components/GlobalAlert';
+import { LoadingContext } from '../../context/LoadingContext';
 
 const style = {
   position: 'absolute',
@@ -15,11 +16,12 @@ const style = {
   p: 3,
 };
 
-const ModalPerfil = ({ open, handleClose, perfil }) => {
+const ModalPerfil = ({ open, handleClose, perfil, perfiles, setPerfiles }) => {
   const [perfil_id, setPerfil_id] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [errors, setErrors] = useState({});
-  
+  const { setIsLoading } = useContext(LoadingContext);
+
   useEffect(() => {
     if (perfil) {
       setPerfil_id(perfil.perfil_id)
@@ -42,6 +44,7 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
+        setIsLoading(true);
         let path = perfil ? '/security/UpdatePefil' : '/security/createPefil'
         const response = await api.post(path, {
           perfil_id,
@@ -50,6 +53,15 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
 
         if(response.data.status) {
           handleClose();
+          if (perfil !== null) {
+            const udatePerfiles = perfiles.map(item => 
+              item.perfil_id === perfil_id ? { ...item, descripcion, descripcion: descripcion } : item
+            );
+            setPerfiles(udatePerfiles);
+          } else  {
+            setPerfiles([...perfiles, { perfil_id, descripcion}])
+          }
+
           GlobalAlert.showSuccess('Registro creado correctamente');
         } else {
           GlobalAlert.showError('Error: ', response.data.message);
@@ -61,10 +73,12 @@ const ModalPerfil = ({ open, handleClose, perfil }) => {
         } else {
           GlobalAlert.showError('Error: ', error);
         }
+      } finally {
+        setIsLoading(false);
       }
     } else {
       setErrors(validationErrors);
-    }
+    } 
   };
 
   return (

@@ -48,12 +48,11 @@ const Perfiles = () => {
         GlobalAlert.showError('Error fetching user profiles: Data is not an array');
       }
     } catch (error) {
-      console.log(error)
       let response = error.response?.data ?? null;
       if(response) {
-        GlobalAlert.showError('Error fetching user profiles', response.message);
+        GlobalAlert.showError('Error: ', response.message);
       } else {
-        GlobalAlert.showError('Error logging in', error);
+        GlobalAlert.showError('Error: ', error);
       }
     } finally {
       setIsLoading(false);
@@ -68,11 +67,19 @@ const Perfiles = () => {
       'Esta seguro en eliminar el registro?',
       async () => {
         try {
+          setIsLoading(true);
           await api.post(`/security/DeletePefil/${perfil_id}`);
           setPerfiles(perfiles.filter(perfil => perfil.perfil_id !== perfil_id));
           GlobalAlert.showSuccess('Registro eliminado correctamente');
         } catch (error) {
-          GlobalAlert.showError('Error deleting profile', error.message);
+          let response = error.response?.data ?? null;
+          if(response) {
+            GlobalAlert.showError('Error: ', response.message);
+          } else {
+            GlobalAlert.showError('Error: ', error);
+          }
+        } finally {
+          setIsLoading(false);
         }
       }  
     )
@@ -84,11 +91,19 @@ const Perfiles = () => {
       'Esta seguro en eliminar el registro?',
       async () => {
         try {
+          setIsLoading(true);
           await api.post(`/security/DeleteUsuarioPefil/${perfilId}/${usuarioId}`);
-          setPerfiles(perfiles.filter(perfil => perfil.perfil_id !== perfilId && perfil.usuario_id !== usuarioId));
+          setUserProfiles(userProfiles.filter(perfil => !(perfil.perfil_id === perfilId && perfil.usuario_id === usuarioId)));
           GlobalAlert.showSuccess('Registro eliminado correctamente');
         } catch (error) {
-          GlobalAlert.showError('Error deleting profile', error.message);
+          let response = error.response?.data ?? null;
+          if(response) {
+            GlobalAlert.showError('Error: ', response.message);
+          } else {
+            GlobalAlert.showError('Error: ', error);
+          }
+        } finally {
+          setIsLoading(false);
         }
       }  
     )
@@ -165,11 +180,15 @@ const Perfiles = () => {
         open={openPerfilModal}
         handleClose={() => setOpenPerfilModal(false)}
         perfil={selectedPerfil}
+        perfiles={perfiles}
+        setPerfiles={setPerfiles}
       />
       <ModalUsuarioPerfil
         open={openUsuarioPerfilModal}
         handleClose={() => setOpenUsuarioPerfilModal(false)}
         usuarioPerfil={selectedUsuarioPerfil}
+        userProfiles={userProfiles}
+        setUserProfiles={setUserProfiles}
       />
     </div>
   );
