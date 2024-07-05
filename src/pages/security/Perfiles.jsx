@@ -163,8 +163,8 @@ const Perfiles = () => {
           <TableBody>
             {Array.isArray(userProfiles) && userProfiles.map((userProfile) => (
               <TableRow key={`${userProfile.usuario_id}-${userProfile.perfil_id}`}>
-                <TableCell>{userProfile.usuario_id}</TableCell>
-                <TableCell>{userProfile.perfil_id}</TableCell>
+                <TableCell>{userProfile.nombre}</TableCell>
+                <TableCell>{userProfile.descripcion}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleDeleteUsuarioPerfil(userProfile.usuario_id, userProfile.perfil_id)}>
                     <Delete />
