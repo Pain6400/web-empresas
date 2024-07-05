@@ -20,7 +20,6 @@ const LoginForm = () => {
 
 
   const handleSubmit = async (e) => {
-    console.log(empresas)
     e.preventDefault();
     const validationErrors = {};
 
