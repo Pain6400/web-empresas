@@ -20,6 +20,7 @@ const LoginForm = () => {
 
 
   const handleSubmit = async (e) => {
+    console.log(empresas)
     e.preventDefault();
     const validationErrors = {};
 
@@ -35,7 +36,7 @@ const LoginForm = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true);
-        const response = await api.post('/account/login', { usuario_id: username, password });
+        const response = await api.post('/account/login', { usuario_id: username, password, empresa_id: empresaId });
         const token = response.data.tokenInfo.token;
         localStorage.setItem('token', token);
         const decodedToken = jwtDecode(token); 
@@ -149,9 +150,9 @@ const LoginForm = () => {
               onChange={(e) => setEmpresaId(e.target.value)}
               label="Empresa"
             >
-              {empresas.map((empresa) => (
-                <MenuItem key={empresa.empresa_id} value={empresa.nombre}>
-                  {empresa.nombre}
+              {empresas.map((em) => (
+                <MenuItem key={em.empresa_id} value={em.empresa_id}>
+                  {em.nombre}
                 </MenuItem>
               ))}
             </Select>

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Modal, Box, Button, Divider, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import api from '../../components/axiosConfig';
 import GlobalAlert from '../../components/GlobalAlert';
+import { LoadingContext } from '../../context/LoadingContext';
 
 const style = {
   position: 'absolute',
@@ -21,6 +22,7 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
   const [usuarios, setUsuarios] = useState([]);
   const [perfiles, setPerfiles] = useState([]);
   const [errors, setErrors] = useState({});
+  const { setIsLoading } = useContext(LoadingContext);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -59,6 +61,7 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
 
     if (Object.keys(validationErrors).length === 0) {
       try {
+        setIsLoading(true);
         let path = '/security/createPerfilPermiso'
         const response = await api.post(path, {
           usuarioId,
@@ -79,6 +82,8 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
         } else {
           GlobalAlert.showError('Error: ', error);
         }
+      } finally {
+        setIsLoading(false);
       }
     } else {
       setErrors(validationErrors);
