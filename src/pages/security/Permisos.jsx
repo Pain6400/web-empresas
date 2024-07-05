@@ -44,7 +44,7 @@ const Permisos = () => {
 
   const fetchPerfilPermisos = async () => {
     try {
-      const response = await api.get('/security/getPerfilPermisos');
+      const response = await api.get('/security/getPefilesPermisos');
       if (Array.isArray(response.data.perfilesPermisos)) {
         setPerfilPermisos(response.data.perfilesPermisos);
       } else {

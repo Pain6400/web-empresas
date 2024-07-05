@@ -106,6 +106,14 @@ const Sidebar = () => {
                       <ListItemText primary="Perfiles" />
                     </ListItemButton>
                   )}
+                  {hasPermission(['Cliente']) && (
+                    <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/permisos" selected={location.pathname === '/seguridad/permisos'}>
+                      <ListItemIcon>
+                        <Group style={{ color: 'white' }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Permisos" />
+                    </ListItemButton>
+                  )}
                 </List>
               </Collapse>
             </>
