@@ -23,6 +23,8 @@ const ModalPerfil = ({ open, handleClose, perfil, perfiles, setPerfiles }) => {
   const { setIsLoading } = useContext(LoadingContext);
 
   useEffect(() => {
+    setPerfil_id('');
+    setDescripcion('');
     if (perfil) {
       setPerfil_id(perfil.perfil_id)
       setDescripcion(perfil.descripcion);

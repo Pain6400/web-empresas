@@ -21,6 +21,8 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
   const [perfilId, setPerfilId] = useState('');
   const [usuarios, setUsuarios] = useState([]);
   const [perfiles, setPerfiles] = useState([]);
+  const [nombre, setNombre] = useState([]);
+  const [descripcion, setDescripcion] = useState([]);
   const [errors, setErrors] = useState({});
   const { setIsLoading } = useContext(LoadingContext);
 
@@ -62,7 +64,7 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true);
-        let path = '/security/createPerfilPermiso'
+        let path = '/security/createUsuarioPerfil'
         const response = await api.post(path, {
           usuarioId,
           perfilId
@@ -70,7 +72,7 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
 
         if(response.data.status) {
           handleClose();
-          setUserProfiles([...userProfiles, { usuario_id: usuarioId, perfil_id: perfilId}])
+          setUserProfiles([...userProfiles, { usuario_id: usuarioId, perfil_id: perfilId, nombre, descripcion }])
           GlobalAlert.showSuccess('Registro creado correctamente');
         } else {
           GlobalAlert.showError('Error: ', response.data.message);
