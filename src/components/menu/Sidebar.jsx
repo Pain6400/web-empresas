@@ -98,6 +98,14 @@ const Sidebar = () => {
               </ListItemButton>
               <Collapse in={openSections.seguridad} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
+                {(hasRoles(['Admin']) || hasPermission(['Usuario'])) && (
+                    <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/usuarios" selected={location.pathname === '/seguridad/usuarios'}>
+                      <ListItemIcon>
+                        <Group style={{ color: 'white' }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Usuarios" />
+                    </ListItemButton>
+                  )}
                   {(hasRoles(['Admin']) || hasPermission(['Perfil'])) && (
                     <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/seguridad/perfiles'}>
                       <ListItemIcon>

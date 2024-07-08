@@ -2,12 +2,17 @@ import React, { useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/menu/Sidebar';
 import Header from './components/menu/Header';
+
+//Pages
 import Login from './pages/account/login';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Clients from './pages/Clients';
 import Perfiles from './pages/security/Perfiles';
 import Permisos from './pages/security/Permisos'
+import Usuarios from './pages/security/Usuarios'
+
+//
 import { UserProvider, UserContext } from './context/UserContext';
 import { LoadingProvider, LoadingContext } from './context/LoadingContext';
 import Loading from './components/Loading';
@@ -94,6 +99,7 @@ const AppContent = () => {
                 <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
                 <Route path="/tasks" element={<PrivateRoute><Tasks /></PrivateRoute>} />
                 <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
+                <Route path="/seguridad/usuarios" element={<PrivateRoute><Usuarios /></PrivateRoute>} />   
                 <Route path="/seguridad/perfiles" element={<PrivateRoute><Perfiles /></PrivateRoute>} />      
                 <Route path="/seguridad/permisos" element={<PrivateRoute><Permisos /></PrivateRoute>} />               
                 <Route path="*" element={<Navigate to="/" />} />
