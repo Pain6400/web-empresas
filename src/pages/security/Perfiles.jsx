@@ -155,8 +155,8 @@ const Perfiles = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Usuario ID</TableCell>
-              <TableCell>Perfil ID</TableCell>
+              <TableCell>Usuario</TableCell>
+              <TableCell>Perfil</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>

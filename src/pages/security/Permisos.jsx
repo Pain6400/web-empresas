@@ -44,7 +44,8 @@ const Permisos = () => {
 
   const fetchPerfilPermisos = async () => {
     try {
-      const response = await api.get('/security/getPefilesPermisos');
+      const response = await api.get('/security/getPermisosPefiles');
+      console.log(response.data)
       if (Array.isArray(response.data.perfilesPermisos)) {
         setPerfilPermisos(response.data.perfilesPermisos);
       } else {
@@ -156,16 +157,16 @@ const Permisos = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Perfil ID</TableCell>
-              <TableCell>Permiso ID</TableCell>
+              <TableCell>Perfil</TableCell>
+              <TableCell>Permiso</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {Array.isArray(perfilPermisos) && perfilPermisos.map((perfilPermiso) => (
               <TableRow key={`${perfilPermiso.perfil_id}-${perfilPermiso.permiso_id}`}>
-                <TableCell>{perfilPermiso.perfil_id}</TableCell>
-                <TableCell>{perfilPermiso.permiso_id}</TableCell>
+                <TableCell>{perfilPermiso.perf_desc}</TableCell>
+                <TableCell>{perfilPermiso.perm_desc}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleDeletePerfilPermiso(perfilPermiso.perfil_id, perfilPermiso.permiso_id)}>
                     <Delete />
