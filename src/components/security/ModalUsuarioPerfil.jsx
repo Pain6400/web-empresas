@@ -21,8 +21,6 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
   const [perfilId, setPerfilId] = useState('');
   const [usuarios, setUsuarios] = useState([]);
   const [perfiles, setPerfiles] = useState([]);
-  const [nombre, setNombre] = useState([]);
-  const [descripcion, setDescripcion] = useState([]);
   const [errors, setErrors] = useState({});
   const { setIsLoading } = useContext(LoadingContext);
 
@@ -72,7 +70,9 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
 
         if(response.data.status) {
           handleClose();
-          setUserProfiles([...userProfiles, { usuario_id: usuarioId, perfil_id: perfilId, nombre, descripcion }])
+          let perf = perfiles.find(perfil => perfil.perfil_id === perfilId)
+          let nomb = usuarios.find(us => us.usuario_id === usuarioId);
+          setUserProfiles([...userProfiles, { usuario_id: usuarioId, perfil_id: perfilId, nombre: nomb.nombre, descripcion: perf.descripcion }])
           GlobalAlert.showSuccess('Registro creado correctamente');
         } else {
           GlobalAlert.showError('Error: ', response.data.message);
@@ -116,7 +116,7 @@ const ModalUsuarioPerfil = ({ open, handleClose, usuarioPerfil, userProfiles, se
           <InputLabel>Perfil ID</InputLabel>
           <Select
             value={perfilId}
-            onChange={(e) => setPerfilId(e.target.value)}
+            onChange={(e) => { setPerfilId(e.target.value)}}
             error={Boolean(errors.perfilId)}
           >
             {perfiles.map((perfil) => (

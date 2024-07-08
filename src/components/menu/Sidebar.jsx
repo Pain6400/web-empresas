@@ -87,7 +87,7 @@ const Sidebar = () => {
           </>
         )}
         {/* Configuracion */}
-        {hasRoles(['Admin']) && (
+        {(hasRoles(['Admin']) || hasPermission(['Perfil']) || hasPermission(['Seguridad'])) && (
             <>
               <ListItemButton onClick={() => handleClick('seguridad')}>
                 <ListItemIcon>
@@ -98,7 +98,7 @@ const Sidebar = () => {
               </ListItemButton>
               <Collapse in={openSections.seguridad} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                  {hasPermission(['Cliente']) && (
+                  {(hasRoles(['Admin']) || hasPermission(['Perfil'])) && (
                     <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/seguridad/perfiles'}>
                       <ListItemIcon>
                         <Group style={{ color: 'white' }} />
@@ -106,7 +106,7 @@ const Sidebar = () => {
                       <ListItemText primary="Perfiles" />
                     </ListItemButton>
                   )}
-                  {hasPermission(['Cliente']) && (
+                  {(hasRoles(['Admin']) || hasPermission(['Cliente'])) && (
                     <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/permisos" selected={location.pathname === '/seguridad/permisos'}>
                       <ListItemIcon>
                         <Group style={{ color: 'white' }} />
