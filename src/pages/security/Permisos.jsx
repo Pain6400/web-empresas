@@ -4,7 +4,7 @@ import { Button, IconButton, Table, TableBody, TableCell, TableContainer, TableH
 import { Delete, Edit } from '@mui/icons-material';
 import GlobalAlert from '../../components/GlobalAlert';
 import ModalPermiso from '../../components/security/ModalPermiso'; // Assume you will create this modal similar to ModalPerfil
-import ModalPerfilPermiso from '../../components/security/ModalPerfilPermiso'; // Assume you will create this modal similar to ModalUsuarioPerfil
+import ModalUsuarioPermiso from '../../components/security/ModalUsuarioPermiso'; // Assume you will create this modal similar to ModalUsuarioPerfil
 import { LoadingContext } from '../../context/LoadingContext';
 
 const Permisos = () => {
@@ -14,11 +14,14 @@ const Permisos = () => {
   const [selectedPerfilPermiso, setSelectedPerfilPermiso] = useState(null);
   const [openPermisoModal, setOpenPermisoModal] = useState(false);
   const [openPerfilPermisoModal, setOpenPerfilPermisoModal] = useState(false);
+  const [usuariosPermisos, setUsuariosPermisos] = useState([]);
+  const [selectedUsuarioPermiso, setSelectedUsuarioPermiso] = useState(null);
+  const [openUsuarioPermisoModal, setOpenUsuarioPermisoModal] = useState(false);
   const { setIsLoading } = useContext(LoadingContext);
 
   useEffect(() => {
     fetchPermisos();
-    fetchPerfilPermisos();
+    fetchUsuariosPermisos();
   }, []);
 
   const fetchPermisos = async () => {
@@ -48,6 +51,26 @@ const Permisos = () => {
       console.log(response.data)
       if (Array.isArray(response.data.perfilesPermisos)) {
         setPerfilPermisos(response.data.perfilesPermisos);
+      } else {
+        GlobalAlert.showError('Error fetching perfil permisos: Data is not an array');
+      }
+    } catch (error) {
+      let response = error.response?.data ?? null;
+      if(response) {
+        GlobalAlert.showError('Error: ', response.message);
+      } else {
+        GlobalAlert.showError('Error: ', error);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchUsuariosPermisos = async () => {
+    try {
+      const response = await api.get('/security/getUsuariosPermisos');
+      if (Array.isArray(response.data.usuariosPermisos)) {
+        setUsuariosPermisos(response.data.usuariosPermisos);
       } else {
         GlobalAlert.showError('Error fetching perfil permisos: Data is not an array');
       }
@@ -111,6 +134,29 @@ const Permisos = () => {
     )
   };
 
+  const handleDeleteUsuarioPermiso = async (usuarioId, permisoId) => {
+    GlobalAlert.showWarning(
+      'Eliminar registro', 
+      'Esta seguro en eliminar el registro?',
+      async () => {
+        try {
+          setIsLoading(true);
+          await api.post(`/security/DeleteUsuarioPermiso/${permisoId}/${usuarioId}`);
+          setUsuariosPermisos(perfilPermisos.filter(usuarioPermiso => !(usuarioPermiso.usuario_id === usuarioId && usuarioPermiso.permiso_id === permisoId)));
+          GlobalAlert.showSuccess('Registro eliminado correctamente');
+        } catch (error) {
+          let response = error.response?.data ?? null;
+          if(response) {
+            GlobalAlert.showError('Error: ', response.message);
+          } else {
+            GlobalAlert.showError('Error: ', error);
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      }  
+    )
+  };
   return (
     <div>
       <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -147,7 +193,7 @@ const Permisos = () => {
         </Table>
       </TableContainer>
 
-      <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5">Perfiles Permisos</Typography>
         <Button variant="contained" color="primary" onClick={() => { setSelectedPerfilPermiso(null); setOpenPerfilPermisoModal(true); }}>
           Crear
@@ -176,8 +222,38 @@ const Permisos = () => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
 
+      <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h5">Usuarios Permisos</Typography>
+        <Button variant="contained" color="primary" onClick={() => { setSelectedUsuarioPermiso(null); setOpenUsuarioPermisoModal(true); }}>
+          Crear
+        </Button>
+      </Box>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Usuario</TableCell>
+              <TableCell>Permiso</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Array.isArray(usuariosPermisos) && usuariosPermisos.map((usuarioPermiso) => (
+              <TableRow key={`${usuarioPermiso.usuario_id}-${usuarioPermiso.permiso_id}`}>
+                <TableCell>{usuarioPermiso.nombre}</TableCell>
+                <TableCell>{usuarioPermiso.descripcion}</TableCell>
+                <TableCell>
+                  <IconButton onClick={() => handleDeleteUsuarioPermiso(usuarioPermiso.usuario_id, usuarioPermiso.permiso_id)}>
+                    <Delete />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <ModalPermiso
         open={openPermisoModal}
         handleClose={() => setOpenPermisoModal(false)}
@@ -185,13 +261,20 @@ const Permisos = () => {
         permisos={permisos}
         setPermisos={setPermisos}
       />
-      <ModalPerfilPermiso
+      {/* <ModalPerfilPermiso
         open={openPerfilPermisoModal}
         handleClose={() => setOpenPerfilPermisoModal(false)}
         perfilPermiso={selectedPerfilPermiso}
         perfilPermisos={perfilPermisos}
         setPerfilPermisos={setPerfilPermisos}
-      />
+      /> */}
+      <ModalUsuarioPermiso
+        open={openUsuarioPermisoModal}
+        handleClose={() => setOpenUsuarioPermisoModal(false)}
+        usuarioPermiso={selectedUsuarioPermiso}
+        usuariosPermisos={usuariosPermisos}
+        setUsuariosPermisos={setUsuariosPermisos}
+      /> 
     </div>
   );
 };
