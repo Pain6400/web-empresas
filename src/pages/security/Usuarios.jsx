@@ -18,7 +18,6 @@ const Usuarios = () => {
   
   useEffect(() => {
     fetchUsuarios();
-    fetchUserEmpresas();
   }, []);
 
   const fetchUsuarios = async () => {
@@ -42,25 +41,6 @@ const Usuarios = () => {
     }
   };
 
-  const fetchUserEmpresas = async () => {
-    try {
-      const response = await api.get('/security/getUsuariosEmpresas');
-      if (Array.isArray(response.data.usuariosEmpresas)) {
-        setUserEmpresas(response.data.usuariosEmpresas);
-      } else {
-        GlobalAlert.showError('Error fetching user companies: Data is not an array');
-      }
-    } catch (error) {
-      let response = error.response?.data ?? null;
-      if(response) {
-        GlobalAlert.showError('Error: ', response.message);
-      } else {
-        GlobalAlert.showError('Error: ', error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleDeleteUsuario = async (usuario_id) => {
     GlobalAlert.showWarning(
@@ -154,50 +134,12 @@ const Usuarios = () => {
         </Table>
       </TableContainer>
 
-      <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Usuarios Empresas</Typography>
-        <Button variant="contained" color="primary" onClick={() => { setSelectedUsuarioPermiso(null); setOpenUsuarioPermisoModal(true); }}>
-          Crear
-        </Button>
-      </Box>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Usuario</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.isArray(userEmpresas) && userEmpresas.map((userEmpresa) => (
-              <TableRow key={`${userEmpresa.usuario_id}`}>
-                <TableCell>{userEmpresa.usuario_id}</TableCell>
-                <TableCell>{userEmpresa.nombre}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleDeleteUsuarioPermiso(userEmpresa.usuario_id)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
       {/* <ModalUsuario
         open={openUsuarioModal}
         handleClose={() => setOpenUsuarioModal(false)}
         usuario={selectedUsuario}
         usuarios={usuarios}
         setUsuarios={setUsuarios}
-      />
-      <ModalUsuarioPermiso
-        open={openUsuarioPermisoModal}
-        handleClose={() => setOpenUsuarioPermisoModal(false)}
-        usuarioPermiso={selectedUsuarioPermiso}
-        userEmpresas={userEmpresas}
-        setUserEmpresas={setUserEmpresas}
       /> */}
     </div>
   );

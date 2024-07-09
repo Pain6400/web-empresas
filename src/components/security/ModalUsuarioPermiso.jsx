@@ -27,7 +27,7 @@ const ModalUsuarioPermiso = ({ open, handleClose, usuarioPermiso, usuariosPermis
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await api.get('/user/getAllUsers');
+        const response = await api.get('/security/getUsuarios');
         setUsuarios(response.data.users);
       } catch (error) {
         GlobalAlert.showError('Error fetching usuarios', error.message);

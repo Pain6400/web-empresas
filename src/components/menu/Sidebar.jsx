@@ -35,6 +35,8 @@ const Sidebar = () => {
     const pathToSectionMap = {
       '/tareas/clientes': 'tareas',
       '/seguridad/perfiles': 'seguridad',
+      '/seguridad/usuarios': 'seguridad',
+      '/seguridad/permisos': 'seguridad',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -74,7 +76,7 @@ const Sidebar = () => {
             </ListItemButton>
             <Collapse in={openSections.tareas} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {hasPermission(['Cliente']) && (
+                {(hasRoles(['Admin']) || hasPermission(['Cle'])) && (
                   <ListItemButton sx={{ pl: 4 }} component={Link} to="/tasks" selected={location.pathname === '/tasks'}>
                     <ListItemIcon>
                       <Group style={{ color: 'white' }} />
@@ -87,7 +89,7 @@ const Sidebar = () => {
           </>
         )}
         {/* Configuracion */}
-        {(hasRoles(['Admin']) || hasPermission(['Perfil']) || hasPermission(['Seguridad'])) && (
+        {(hasRoles(['Admin']) || hasPermission(['usuarios','Perfil', 'Permisos', 'Clie'])) && (
             <>
               <ListItemButton onClick={() => handleClick('seguridad')}>
                 <ListItemIcon>
@@ -114,7 +116,7 @@ const Sidebar = () => {
                       <ListItemText primary="Perfiles" />
                     </ListItemButton>
                   )}
-                  {(hasRoles(['Admin']) || hasPermission(['Cliente'])) && (
+                  {(hasRoles(['Admin']) || hasPermission(['Permisos'])) && (
                     <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/permisos" selected={location.pathname === '/seguridad/permisos'}>
                       <ListItemIcon>
                         <Group style={{ color: 'white' }} />
