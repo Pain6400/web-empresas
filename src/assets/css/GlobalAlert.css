@@ -1,0 +1,5 @@
+/* src/components/GlobalAlert.css */
+.swal2-container {
+    z-index: 2000 !important; /* Adjust this value as needed to be higher than your modal's z-index */
+  }
+  

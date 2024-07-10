@@ -3,17 +3,13 @@ import api from '../../components/axiosConfig';
 import { Button, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 import GlobalAlert from '../../components/GlobalAlert';
-//import ModalUsuario from '../../components/security/ModalUsuario';
-//import ModalUsuarioEmpresa from '../../components/security/ModalUsuarioEmpresa';
+import ModalUsuario from '../../components/security/ModalUsuario';
 import { LoadingContext } from '../../context/LoadingContext';
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
-  const [userEmpresas, setUserEmpresas] = useState([]);
   const [selectedUsuario, setSelectedUsuario] = useState(null);
-  const [selectedUsuarioPermiso, setSelectedUsuarioPermiso] = useState(null);
   const [openUsuarioModal, setOpenUsuarioModal] = useState(false);
-  const [openUsuarioPermisoModal, setOpenUsuarioPermisoModal] = useState(false);
   const { setIsLoading } = useContext(LoadingContext);
   
   useEffect(() => {
@@ -41,54 +37,6 @@ const Usuarios = () => {
     }
   };
 
-
-  const handleDeleteUsuario = async (usuario_id) => {
-    GlobalAlert.showWarning(
-      'Eliminar registro', 
-      'Esta seguro en eliminar el registro?',
-      async () => {
-        try {
-          setIsLoading(true);
-          await api.post(`/user/DeleteUser/${usuario_id}`);
-          setUsuarios(usuarios.filter(usuario => usuario.usuario_id !== usuario_id));
-          GlobalAlert.showSuccess('Registro eliminado correctamente');
-        } catch (error) {
-          let response = error.response?.data ?? null;
-          if(response) {
-            GlobalAlert.showError('Error: ', response.message);
-          } else {
-            GlobalAlert.showError('Error: ', error);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }  
-    )
-  };
-
-  const handleDeleteUsuarioPermiso = async (usuarioId, empresaId) => {
-    GlobalAlert.showWarning(
-      'Eliminar registro', 
-      'Esta seguro en eliminar el registro?',
-      async () => {
-        try {
-          setIsLoading(true);
-          await api.post(`/user/DeleteUsuarioEmpresa/${empresaId}/${usuarioId}`);
-          setUserEmpresas(userEmpresas.filter(emp => !(emp.empresa_id === empresaId && emp.usuario_id === usuarioId)));
-          GlobalAlert.showSuccess('Registro eliminado correctamente');
-        } catch (error) {
-          let response = error.response?.data ?? null;
-          if(response) {
-            GlobalAlert.showError('Error: ', response.message);
-          } else {
-            GlobalAlert.showError('Error: ', error);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }  
-    )
-  };
 
   return (
     <div>
@@ -119,13 +67,10 @@ const Usuarios = () => {
                 <TableCell>{usuario.identidad}</TableCell>
                 <TableCell>{usuario.telefono}</TableCell>
                 <TableCell>{usuario.correo}</TableCell>
-                <TableCell>{usuario.estado}</TableCell>
+                <TableCell>{usuario.estado === '1' ? 'Activo': 'Inactivo'}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => { setSelectedUsuario(usuario); setOpenUsuarioModal(true); }}>
                     <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeleteUsuario(usuario.usuario_id)}>
-                    <Delete />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -134,13 +79,13 @@ const Usuarios = () => {
         </Table>
       </TableContainer>
 
-      {/* <ModalUsuario
+      <ModalUsuario
         open={openUsuarioModal}
         handleClose={() => setOpenUsuarioModal(false)}
         usuario={selectedUsuario}
         usuarios={usuarios}
         setUsuarios={setUsuarios}
-      /> */}
+      />
     </div>
   );
 };

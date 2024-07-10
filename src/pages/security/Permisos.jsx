@@ -182,13 +182,6 @@ const Permisos = () => {
         permisos={permisos}
         setPermisos={setPermisos}
       />
-      {/* <ModalPerfilPermiso
-        open={openPerfilPermisoModal}
-        handleClose={() => setOpenPerfilPermisoModal(false)}
-        perfilPermiso={selectedPerfilPermiso}
-        perfilPermisos={perfilPermisos}
-        setPerfilPermisos={setPerfilPermisos}
-      /> */}
       <ModalUsuarioPermiso
         open={openUsuarioPermisoModal}
         handleClose={() => setOpenUsuarioPermisoModal(false)}

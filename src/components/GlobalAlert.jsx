@@ -1,5 +1,6 @@
 // src/components/GlobalAlert.js
 import Swal from 'sweetalert2';
+import '../assets/css/GlobalAlert.css'; // Create and import a custom CSS file
 
 const GlobalAlert = {
   showError: (title, text) => {
@@ -30,7 +31,16 @@ const GlobalAlert = {
       }
     });
   },
-  // Add more methods if needed
+  showErrorModal: (title, text) => {
+    Swal.fire({
+      icon: 'error',
+      title: title || 'Error',
+      text: text || 'Something went wrong!',
+      customClass: {
+        container: 'swal2-container',
+      },
+    });
+  },
 };
 
 export default GlobalAlert;
