@@ -9,11 +9,8 @@ import { LoadingContext } from '../../context/LoadingContext';
 
 const Permisos = () => {
   const [permisos, setPermisos] = useState([]);
-  const [perfilPermisos, setPerfilPermisos] = useState([]);
   const [selectedPermiso, setSelectedPermiso] = useState(null);
-  const [selectedPerfilPermiso, setSelectedPerfilPermiso] = useState(null);
-  const [openPermisoModal, setOpenPermisoModal] = useState(false);
-  const [openPerfilPermisoModal, setOpenPerfilPermisoModal] = useState(false);
+  const [openPermisoModal, setOpenPermisoModal] = useState(false);;
   const [usuariosPermisos, setUsuariosPermisos] = useState([]);
   const [selectedUsuarioPermiso, setSelectedUsuarioPermiso] = useState(null);
   const [openUsuarioPermisoModal, setOpenUsuarioPermisoModal] = useState(false);
@@ -39,27 +36,6 @@ const Permisos = () => {
         GlobalAlert.showError('Error fetching permisos', response.message);
       } else {
         GlobalAlert.showError('Error logging in', error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchPerfilPermisos = async () => {
-    try {
-      const response = await api.get('/security/getPermisosPefiles');
-      console.log(response.data)
-      if (Array.isArray(response.data.perfilesPermisos)) {
-        setPerfilPermisos(response.data.perfilesPermisos);
-      } else {
-        GlobalAlert.showError('Error fetching perfil permisos: Data is not an array');
-      }
-    } catch (error) {
-      let response = error.response?.data ?? null;
-      if(response) {
-        GlobalAlert.showError('Error: ', response.message);
-      } else {
-        GlobalAlert.showError('Error: ', error);
       }
     } finally {
       setIsLoading(false);
@@ -110,30 +86,6 @@ const Permisos = () => {
     )
   };
 
-  const handleDeletePerfilPermiso = async (perfilId, permisoId) => {
-    GlobalAlert.showWarning(
-      'Eliminar registro', 
-      'Esta seguro en eliminar el registro?',
-      async () => {
-        try {
-          setIsLoading(true);
-          await api.post(`/security/DeletePerfilPermiso/${perfilId}/${permisoId}`);
-          setPerfilPermisos(perfilPermisos.filter(perfilPermiso => !(perfilPermiso.perfil_id === perfilId && perfilPermiso.permiso_id === permisoId)));
-          GlobalAlert.showSuccess('Registro eliminado correctamente');
-        } catch (error) {
-          let response = error.response?.data ?? null;
-          if(response) {
-            GlobalAlert.showError('Error: ', response.message);
-          } else {
-            GlobalAlert.showError('Error: ', error);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }  
-    )
-  };
-
   const handleDeleteUsuarioPermiso = async (usuarioId, permisoId) => {
     GlobalAlert.showWarning(
       'Eliminar registro', 
@@ -142,7 +94,7 @@ const Permisos = () => {
         try {
           setIsLoading(true);
           await api.post(`/security/DeleteUsuarioPermiso/${permisoId}/${usuarioId}`);
-          setUsuariosPermisos(perfilPermisos.filter(usuarioPermiso => !(usuarioPermiso.usuario_id === usuarioId && usuarioPermiso.permiso_id === permisoId)));
+          setUsuariosPermisos(usuariosPermisos.filter(usuarioPermiso => !(usuarioPermiso.usuario_id === usuarioId && usuarioPermiso.permiso_id === permisoId)));
           GlobalAlert.showSuccess('Registro eliminado correctamente');
         } catch (error) {
           let response = error.response?.data ?? null;
@@ -192,37 +144,6 @@ const Permisos = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Perfiles Permisos</Typography>
-        <Button variant="contained" color="primary" onClick={() => { setSelectedPerfilPermiso(null); setOpenPerfilPermisoModal(true); }}>
-          Crear
-        </Button>
-      </Box>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Perfil</TableCell>
-              <TableCell>Permiso</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.isArray(perfilPermisos) && perfilPermisos.map((perfilPermiso) => (
-              <TableRow key={`${perfilPermiso.perfil_id}-${perfilPermiso.permiso_id}`}>
-                <TableCell>{perfilPermiso.perf_desc}</TableCell>
-                <TableCell>{perfilPermiso.perm_desc}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleDeletePerfilPermiso(perfilPermiso.perfil_id, perfilPermiso.permiso_id)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
 
       <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5">Usuarios Permisos</Typography>

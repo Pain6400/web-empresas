@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Dashboard, Assignment, Group, ExpandLess, ExpandMore, Settings } from '@mui/icons-material';
+import { Dashboard, Assignment, Group, ExpandLess, ExpandMore, Settings, PersonSearch, VerifiedUser } from '@mui/icons-material';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
 import logo from '../../assets/logo.png'; 
 import { UserContext } from '../../context/UserContext';
@@ -111,7 +111,7 @@ const Sidebar = () => {
                   {(hasRoles(['Admin']) || hasPermission(['Perfil'])) && (
                     <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/seguridad/perfiles'}>
                       <ListItemIcon>
-                        <Group style={{ color: 'white' }} />
+                        <PersonSearch style={{ color: 'white' }} />
                       </ListItemIcon>
                       <ListItemText primary="Perfiles" />
                     </ListItemButton>
@@ -119,7 +119,7 @@ const Sidebar = () => {
                   {(hasRoles(['Admin']) || hasPermission(['Permisos'])) && (
                     <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/permisos" selected={location.pathname === '/seguridad/permisos'}>
                       <ListItemIcon>
-                        <Group style={{ color: 'white' }} />
+                        <VerifiedUser style={{ color: 'white' }} />
                       </ListItemIcon>
                       <ListItemText primary="Permisos" />
                     </ListItemButton>
