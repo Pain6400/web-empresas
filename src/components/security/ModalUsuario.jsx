@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Modal, Box, TextField, Button, Divider } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Modal, Box, TextField, Button, Divider, Switch, FormControlLabel } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import api from '../../components/axiosConfig';
 import GlobalAlert from '../../components/GlobalAlert';
-import { LoadingContext } from '../../context/LoadingContext';
 
 const style = {
   position: 'absolute',
@@ -23,8 +23,9 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
   const [telefono, setTelefono] = useState('');
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
+  const [estado, setEstado] = useState(false);
   const [errors, setErrors] = useState({});
-  const { setIsLoading } = useContext(LoadingContext);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (usuario !== null) {
@@ -33,6 +34,7 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
       setIdentidad(usuario.identidad);
       setTelefono(usuario.telefono);
       setCorreo(usuario.correo);
+      setEstado(!!parseInt(usuario.estado, 10))
     } else {
         setUsuario_id('');
         setNombre('');
@@ -41,7 +43,7 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
         setCorreo('');
         setPassword('');
     }
-  }, []);
+  }, [usuario]);
 
   const handleSubmit = async () => {
     const validationErrors = {};
@@ -69,14 +71,15 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        setIsLoading(true);
-        let path = usuario ? '/security/updateUser' : '/security/createUsuario';
+        setLoading(true);
+        let path = usuario ? '/security/updateUsuario' : '/security/createUsuario';
         const payload = {
           usuario_id,
           nombre,
           identidad,
           telefono,
           correo,
+          estado: estado === true ? '1' : '2'
         };
 
         if (usuario == null) {
@@ -109,7 +112,7 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
           GlobalAlert.showErrorModal('Error: ', error);
         }
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     } else {
       setErrors(validationErrors);
@@ -119,7 +122,7 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <h3>{usuario ? 'Editar Usuario' : 'Nuevo Usuario'}</h3>
+        <h3>{usuario ? "Editar Usuario" : "Nuevo Usuario"}</h3>
         <Divider />
 
         <TextField
@@ -186,9 +189,27 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
           />
         )}
 
-        <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ mt: 2 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={estado}
+              onChange={(e) => setEstado(e.target.checked)}
+              name="estado"
+              color="primary"
+            />
+          }
+          label={estado ? "Activo" : "Inactivo"}
+          sx={{ mt: 2 }}
+        />
+        <LoadingButton
+          onClick={handleSubmit}
+          loading={loading}
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2 }}
+        >
           Guardar
-        </Button>
+        </LoadingButton>
       </Box>
     </Modal>
   );
