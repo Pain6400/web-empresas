@@ -13,14 +13,14 @@ const Sidebar = () => {
     if (!user || !user.permissions || user.permissions.length === 0) {
       return false;
     }
-    return requiredPermissions.every(permission => user.permissions.includes(permission));
+    return requiredPermissions.some(permission => user.permissions.includes(permission));
   };
 
   const hasRoles = (requiredRoles) => {
     if (!user || !user.roles || user.roles.length === 0) {
       return false;
     }
-    return requiredRoles.every(rol => user.roles.includes(rol));
+    return requiredRoles.some(rol => user.roles.includes(rol));
   };
 
   const handleClick = (section) => {
@@ -37,6 +37,7 @@ const Sidebar = () => {
       '/seguridad/perfiles': 'seguridad',
       '/seguridad/usuarios': 'seguridad',
       '/seguridad/permisos': 'seguridad',
+      '/mantenimientos/clientes': 'clientes',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -88,6 +89,32 @@ const Sidebar = () => {
             </Collapse>
           </>
         )}
+        
+        {/* Mantenimientos */}
+        {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['Clientes'])) && (
+          <>
+            <ListItemButton onClick={() => handleClick('mantenimientos')}>
+              <ListItemIcon>
+                <Assignment style={{ color: 'white' }} />
+              </ListItemIcon>
+              <ListItemText primary="Mantenimientos" />
+              {openSections.mantenimientos ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+            </ListItemButton>
+            <Collapse in={openSections.mantenimientos} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['Clientes'])) && (
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/clientes" selected={location.pathname === '/mantenimientos/clientes'}>
+                    <ListItemIcon>
+                      <Group style={{ color: 'white' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Clientes" />
+                  </ListItemButton>
+                )}
+              </List>
+            </Collapse>
+          </>
+        )}
+
         {/* Configuracion */}
         {(hasRoles(['Admin']) || hasPermission(['usuarios','Perfil', 'Permisos', 'Clie'])) && (
             <>
