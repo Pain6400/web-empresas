@@ -3,7 +3,7 @@ import api from '../../components/axiosConfig';
 import { Button, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
 import { Edit } from '@mui/icons-material';
 import GlobalAlert from '../../components/GlobalAlert';
-//import ModalCliente from '../../components/security/ModalCliente';
+import ModalCliente from '../../components/maintenance/ModalCliente';
 import { LoadingContext } from '../../context/LoadingContext';
 
 const Clientes = () => {
@@ -20,7 +20,6 @@ const Clientes = () => {
     setIsLoading(true)
     try {
       const response = await api.get('/maintenance/getClientes');
-      console.log(response)
       if (Array.isArray(response.data.client)) {
         setClientes(response.data.client);
       } else {
@@ -90,13 +89,13 @@ const Clientes = () => {
         </Table>
       </TableContainer>
 
-      {/* <ModalCliente
+      <ModalCliente
         open={openClienteModal}
         handleClose={() => setOpenClienteModal(false)}
         Cliente={selectedCliente}
         Clientes={Clientes}
         setClientes={setClientes}
-      /> */}
+      />
     </div>
   );
 };

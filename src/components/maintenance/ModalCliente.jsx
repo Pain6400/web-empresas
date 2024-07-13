@@ -1,218 +1,432 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button, Divider, Switch, FormControlLabel } from '@mui/material';
+import { Modal, Box, TextField, Button, Divider, FormControlLabel, Switch, Grid } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import api from '../../components/axiosConfig';
 import GlobalAlert from '../../components/GlobalAlert';
 
 const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 3,
-};
-
-const ModalCliente = ({ open, handleClose, Cliente, clientes, setClientes }) => {
-  const [Cliente_id, setCliente_id] = useState('');
-  const [nombre, setNombre] = useState('');
-  const [identidad, setIdentidad] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [password, setPassword] = useState('');
-  const [estado, setEstado] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (Cliente !== null) {
-      setCliente_id(Cliente.Cliente_id);
-      setNombre(Cliente.nombre);
-      setIdentidad(Cliente.identidad);
-      setTelefono(Cliente.telefono);
-      setCorreo(Cliente.correo);
-      setEstado(!!parseInt(Cliente.estado, 10))
-    } else {
-        setCliente_id('');
-        setNombre('');
-        setIdentidad('');
-        setTelefono('');
-        setCorreo('');
-        setPassword('');
-    }
-  }, [Cliente]);
-
-  const handleSubmit = async () => {
-    const validationErrors = {};
-
-    if (!cliente_id) {
-      validationErrors.cliente_id = 'El ID del Cliente es obligatorio';
-    }
-    if (!nombre) {
-      validationErrors.nombre = 'El nombre es obligatorio';
-    }
-    if (!identidad) {
-      validationErrors.identidad = 'La identidad es obligatoria';
-    }
-    if (!telefono) {
-      validationErrors.telefono = 'El teléfono es obligatorio';
-    }
-    if (!correo) {
-      validationErrors.correo = 'El correo es obligatorio';
-    }
-    if (!Cliente) {
-      if (!password) {
-        validationErrors.password = 'La contraseña es obligatoria';
-      }
-    }
-
-    if (Object.keys(validationErrors).length === 0) {
-      try {
-        setLoading(true);
-        let path = Cliente ? '/security/updateCliente' : '/security/createCliente';
-        const payload = {
-        cliente_id,
-          nombre,
-          identidad,
-          telefono,
-          correo,
-          estado: estado === true ? '1' : '2'
-        };
-
-        if (Cliente == null) {
-          payload.password = password;
-        }
-        console.log(payload)
-        const response = await api.post(path, payload);
-
-        if (response.data.status) {
-          handleClose();
-          if (Cliente !== null) {
-            const updatedClientes = clientes.map(item =>
-              item.cliente_id === cliente_id ? { ...item, nombre, identidad, telefono, correo } : item
-            );
-            setClientes(updatedClientes);
-          } else {
-            setClientes([...clientes, { cliente_id, nombre, identidad, telefono, correo }]);
-          }
-
-          GlobalAlert.showSuccess('Registro creado correctamente');
-        } else {
-          GlobalAlert.showErrorModal('Error: ', response.data.message);
-        }
-      } catch (error) {
-        console.log(error)
-        let response = error.response?.data ?? null;
-        if (response) {
-          GlobalAlert.showErrorModal('Error: ', response.message);
-        } else {
-          GlobalAlert.showErrorModal('Error: ', error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setErrors(validationErrors);
-    }
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '60%',
+    maxHeight: '90%',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 3,
+    overflow: 'auto',
   };
 
-  return (
-    <Modal open={open} onClose={handleClose}>
+const ModalCliente = ({ open, handleClose, cliente, clientes, setClientes }) => {
+    const [codigo_interno, setCodigo_interno] = useState('');
+    const [tipo_cliente, setTipo_cliente] = useState('');
+    const [forma_pago, setForma_pago] = useState('');
+    const [numero_identidad, setNumero_identidad] = useState('');
+    const [rtn, setRtn] = useState('');
+    const [primer_nombre, setPrimer_nombre] = useState('');
+    const [segundo_nombre, setSegundo_nombre] = useState('');
+    const [primer_apellido, setPrimer_apellido] = useState('');
+    const [segundo_apellido, setSegundo_apellido] = useState('');
+    const [pais_id, setPais_id] = useState('');
+    const [departamento_id, setDepartamento_id] = useState('');
+    const [municipio_id, setMunicipio_id] = useState('');
+    const [direccion, setDireccion] = useState('');
+    const [telefono, setTelefono] = useState('');
+    const [correo, setCorreo] = useState('');
+    const [saldo, setSaldo] = useState('');
+    const [limite_credito, setLimite_credito] = useState('');
+    const [estado, setEstado] = useState(false);
+    const [comentario, setComentario] = useState('');
+    const [fecha_creo, setFecha_creo] = useState('');
+    const [usuario_creo, setUsuario_creo] = useState('');
+    const [fecha_modifico, setFecha_modifico] = useState('');
+    const [usuario_modifico, setUsuario_modifico] = useState('');
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (cliente !== null && cliente !== undefined) {
+            console.log(cliente, 'test')
+            setCodigo_interno(cliente.codigo_interno);
+            setTipo_cliente(cliente.tipo_cliente);
+            setForma_pago(cliente.forma_pago);
+            setNumero_identidad(cliente.numero_identidad);
+            setRtn(cliente.rtn);
+            setPrimer_nombre(cliente.primer_nombre);
+            setSegundo_nombre(cliente.segundo_nombre);
+            setPrimer_apellido(cliente.primer_apellido);
+            setSegundo_apellido(cliente.segundo_apellido);
+            setPais_id(cliente.pais_id);
+            setDepartamento_id(cliente.departamento_id);
+            setMunicipio_id(cliente.municipio_id);
+            setDireccion(cliente.direccion);
+            setTelefono(cliente.telefono);
+            setCorreo(cliente.correo);
+            setSaldo(cliente.saldo);
+            setLimite_credito(cliente.limite_credito);
+            setEstado(!!parseInt(cliente.estado, 10));
+            setComentario(cliente.comentario);
+            setFecha_creo(cliente.fecha_creo);
+            setUsuario_creo(cliente.usuario_creo);
+            setFecha_modifico(cliente.fecha_modifico);
+            setUsuario_modifico(cliente.usuario_modifico);
+        } else {
+            setCodigo_interno('');
+            setTipo_cliente('');
+            setForma_pago('');
+            setNumero_identidad('');
+            setRtn('');
+            setPrimer_nombre('');
+            setSegundo_nombre('');
+            setPrimer_apellido('');
+            setSegundo_apellido('');
+            setPais_id('');
+            setDepartamento_id('');
+            setMunicipio_id('');
+            setDireccion('');
+            setTelefono('');
+            setCorreo('');
+            setSaldo('');
+            setLimite_credito('');
+            setEstado(false);
+            setComentario('');
+            setFecha_creo('');
+            setUsuario_creo('');
+            setFecha_modifico('');
+            setUsuario_modifico('');
+        }
+    }, [cliente]);
+
+    const handleSubmit = async () => {
+        const validationErrors = {};
+
+        if (!codigo_interno) {
+            validationErrors.codigo_interno = 'El código interno es obligatorio';
+        }
+        if (!tipo_cliente) {
+            validationErrors.tipo_cliente = 'El tipo de cliente es obligatorio';
+        }
+        if (!forma_pago) {
+            validationErrors.forma_pago = 'La forma de pago es obligatoria';
+        }
+        if (!numero_identidad) {
+            validationErrors.numero_identidad = 'El número de identidad es obligatorio';
+        }
+        if (!rtn) {
+            validationErrors.rtn = 'El RTN es obligatorio';
+        }
+        if (!primer_nombre) {
+            validationErrors.primer_nombre = 'El primer nombre es obligatorio';
+        }
+        if (!primer_apellido) {
+            validationErrors.primer_apellido = 'El primer apellido es obligatorio';
+        }
+        if (!pais_id) {
+            validationErrors.pais_id = 'El ID del país es obligatorio';
+        }
+        if (!departamento_id) {
+            validationErrors.departamento_id = 'El ID del departamento es obligatorio';
+        }
+        if (!municipio_id) {
+            validationErrors.municipio_id = 'El ID del municipio es obligatorio';
+        }
+        if (!direccion) {
+            validationErrors.direccion = 'La dirección es obligatoria';
+        }
+        if (!telefono) {
+            validationErrors.telefono = 'El teléfono es obligatorio';
+        }
+        if (!correo) {
+            validationErrors.correo = 'El correo es obligatorio';
+        }
+        if (!saldo) {
+            validationErrors.saldo = 'El saldo es obligatorio';
+        }
+        if (!limite_credito) {
+            validationErrors.limite_credito = 'El límite de crédito es obligatorio';
+        }
+
+        if (Object.keys(validationErrors).length === 0) {
+            try {
+                setLoading(true);
+                let path = cliente ? '/clientes/updateCliente' : '/clientes/createCliente';
+                const payload = {
+                    codigo_interno,
+                    tipo_cliente,
+                    forma_pago,
+                    numero_identidad,
+                    rtn,
+                    primer_nombre,
+                    segundo_nombre,
+                    primer_apellido,
+                    segundo_apellido,
+                    pais_id,
+                    departamento_id,
+                    municipio_id,
+                    direccion,
+                    telefono,
+                    correo,
+                    saldo,
+                    limite_credito,
+                    estado: estado === true ? '1' : '2',
+                    comentario,
+                    fecha_creo,
+                    usuario_creo,
+                    fecha_modifico,
+                    usuario_modifico
+                };
+
+                const response = await api.post(path, payload);
+
+                if (response.data.status) {
+                    handleClose();
+                    if (cliente !== null) {
+                        const updatedClientes = clientes.map(item =>
+                            item.cliente_id === cliente.cliente_id ? { ...item, ...payload } : item
+                        );
+                        setClientes(updatedClientes);
+                    } else {
+                        setClientes([...clientes, { cliente_id: response.data.cliente_id, ...payload }]);
+                    }
+
+                    GlobalAlert.showSuccess('Registro creado correctamente');
+                } else {
+                    GlobalAlert.showErrorModal('Error: ', response.data.message);
+                }
+            } catch (error) {
+                let response = error.response?.data ?? null;
+                if (response) {
+                    GlobalAlert.showErrorModal('Error: ', response.message);
+                } else {
+                    GlobalAlert.showErrorModal('Error: ', error);
+                }
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            setErrors(validationErrors);
+        }
+    };
+
+    return (
+        <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <h3>{Cliente ? "Editar Cliente" : "Nuevo Cliente"}</h3>
+        <h3>{cliente ? "Editar Cliente" : "Nuevo Cliente"}</h3>
         <Divider />
 
-        <TextField
-          disabled={Boolean(Cliente)}
-          label="Cliente ID"
-          value={cliente_id}
-          onChange={(e) => setCliente_id(e.target.value)}
-          fullWidth
-          error={Boolean(errors.cliente_id)}
-          helperText={errors.cliente_id}
-          sx={{ mt: 2 }}
-        />
-
-        <TextField
-          label="Nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          fullWidth
-          error={Boolean(errors.nombre)}
-          helperText={errors.nombre}
-          sx={{ mt: 2 }}
-        />
-
-        <TextField
-          label="Identidad"
-          value={identidad}
-          onChange={(e) => setIdentidad(e.target.value)}
-          fullWidth
-          error={Boolean(errors.identidad)}
-          helperText={errors.identidad}
-          sx={{ mt: 2 }}
-        />
-
-        <TextField
-          label="Teléfono"
-          value={telefono}
-          onChange={(e) => setTelefono(e.target.value)}
-          fullWidth
-          error={Boolean(errors.telefono)}
-          helperText={errors.telefono}
-          sx={{ mt: 2 }}
-        />
-
-        <TextField
-          label="Correo"
-          value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
-          fullWidth
-          error={Boolean(errors.correo)}
-          helperText={errors.correo}
-          sx={{ mt: 2 }}
-        />
-
-        {!Cliente && (
-          <TextField
-            label="Contraseña"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            error={Boolean(errors.password)}
-            helperText={errors.password}
-            sx={{ mt: 2 }}
-          />
-        )}
-
-        <FormControlLabel
-          control={
-            <Switch
-              checked={estado}
-              onChange={(e) => setEstado(e.target.checked)}
-              name="estado"
-              color="primary"
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <TextField
+              label="Código Interno"
+              value={codigo_interno}
+              onChange={(e) => setCodigo_interno(e.target.value)}
+              fullWidth
+              error={Boolean(errors.codigo_interno)}
+              helperText={errors.codigo_interno}
+              sx={{ mt: 2 }}
             />
-          }
-          label={estado ? "Activo" : "Inactivo"}
-          sx={{ mt: 2 }}
-        />
-        <LoadingButton
-          onClick={handleSubmit}
-          loading={loading}
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          Guardar
-        </LoadingButton>
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Tipo Cliente"
+              value={tipo_cliente}
+              onChange={(e) => setTipo_cliente(e.target.value)}
+              fullWidth
+              error={Boolean(errors.tipo_cliente)}
+              helperText={errors.tipo_cliente}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Forma Pago"
+              value={forma_pago}
+              onChange={(e) => setForma_pago(e.target.value)}
+              fullWidth
+              error={Boolean(errors.forma_pago)}
+              helperText={errors.forma_pago}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Número Identidad"
+              value={numero_identidad}
+              onChange={(e) => setNumero_identidad(e.target.value)}
+              fullWidth
+              error={Boolean(errors.numero_identidad)}
+              helperText={errors.numero_identidad}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="RTN"
+              value={rtn}
+              onChange={(e) => setRtn(e.target.value)}
+              fullWidth
+              error={Boolean(errors.rtn)}
+              helperText={errors.rtn}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Primer Nombre"
+              value={primer_nombre}
+              onChange={(e) => setPrimer_nombre(e.target.value)}
+              fullWidth
+              error={Boolean(errors.primer_nombre)}
+              helperText={errors.primer_nombre}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Segundo Nombre"
+              value={segundo_nombre}
+              onChange={(e) => setSegundo_nombre(e.target.value)}
+              fullWidth
+              error={Boolean(errors.segundo_nombre)}
+              helperText={errors.segundo_nombre}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Primer Apellido"
+              value={primer_apellido}
+              onChange={(e) => setPrimer_apellido(e.target.value)}
+              fullWidth
+              error={Boolean(errors.primer_apellido)}
+              helperText={errors.primer_apellido}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Segundo Apellido"
+              value={segundo_apellido}
+              onChange={(e) => setSegundo_apellido(e.target.value)}
+              fullWidth
+              error={Boolean(errors.segundo_apellido)}
+              helperText={errors.segundo_apellido}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="País ID"
+              value={pais_id}
+              onChange={(e) => setPais_id(e.target.value)}
+              fullWidth
+              error={Boolean(errors.pais_id)}
+              helperText={errors.pais_id}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Departamento ID"
+              value={departamento_id}
+              onChange={(e) => setDepartamento_id(e.target.value)}
+              fullWidth
+              error={Boolean(errors.departamento_id)}
+              helperText={errors.departamento_id}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Municipio ID"
+              value={municipio_id}
+              onChange={(e) => setMunicipio_id(e.target.value)}
+              fullWidth
+              error={Boolean(errors.municipio_id)}
+              helperText={errors.municipio_id}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Dirección"
+              value={direccion}
+              onChange={(e) => setDireccion(e.target.value)}
+              fullWidth
+              error={Boolean(errors.direccion)}
+              helperText={errors.direccion}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Teléfono"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+              fullWidth
+              error={Boolean(errors.telefono)}
+              helperText={errors.telefono}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Correo"
+              value={correo}
+              onChange={(e) => setCorreo(e.target.value)}
+              fullWidth
+              error={Boolean(errors.correo)}
+              helperText={errors.correo}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Saldo"
+              value={saldo}
+              onChange={(e) => setSaldo(e.target.value)}
+              fullWidth
+              error={Boolean(errors.saldo)}
+              helperText={errors.saldo}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Límite Crédito"
+              value={limite_credito}
+              onChange={(e) => setLimite_credito(e.target.value)}
+              fullWidth
+              error={Boolean(errors.limite_credito)}
+              helperText={errors.limite_credito}
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Comentario"
+              value={comentario}
+              onChange={(e) => setComentario(e.target.value)}
+              fullWidth
+              sx={{ mt: 2 }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <LoadingButton
+              onClick={handleSubmit}
+              loading={loading}
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2 }}
+            >
+              Guardar
+            </LoadingButton>
+          </Grid>
+        </Grid>
       </Box>
-    </Modal>
-  );
+        </Modal>
+    );
 };
 
 export default ModalCliente;
