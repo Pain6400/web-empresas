@@ -50,7 +50,7 @@ const Sidebar = () => {
     }
   }, [location.pathname]);
   return (
-    <div style={{ width: '250px', background: '#4B0082', height: '100vh', color: 'white' }}>
+    <div style={{ width: '250px', background: '#0b40a8', height: '100vh', color: 'white' }}>
       <div style={{ padding: '20px', textAlign: 'center' }}>
         <img 
           src={logo}

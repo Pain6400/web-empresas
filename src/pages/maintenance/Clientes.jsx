@@ -42,7 +42,7 @@ const Clientes = () => {
 
   return (
     <div>
-      <Box sx={{ backgroundColor: '#6A1B9A', color: 'white', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5">Clientes</Typography>
         <Button variant="contained" color="primary" onClick={() => { setSelectedCliente(null); setOpenClienteModal(true); }}>
           Crear
