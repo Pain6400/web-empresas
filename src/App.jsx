@@ -2,6 +2,9 @@ import React, { useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/menu/Sidebar';
 import Header from './components/menu/Header';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './assets/theme.js';
 
 //Pages
 import Login from './pages/account/login';
@@ -121,11 +124,14 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <LoadingProvider>
-    <UserProvider>
-      <AppContent />
-    </UserProvider>
-  </LoadingProvider>
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <LoadingProvider>
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
+    </LoadingProvider>
+  </ThemeProvider>
 );
 
 export default App;
