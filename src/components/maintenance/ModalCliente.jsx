@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Divider, FormControl, Switch, Grid, InputLabel, Select, MenuItem } from '@mui/material';
+import { Modal, Box, TextField, Divider, FormControl, Switch, Grid, InputLabel, Select, MenuItem, FormControlLabel } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import api from '../../components/axiosConfig';
 import GlobalAlert from '../../components/GlobalAlert';
@@ -19,6 +19,7 @@ const style = {
   };
 
 const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
+    const [cliente_id, setCliente_id] = useState(0);
     const [codigo_interno, setCodigo_interno] = useState('');
     const [tipo_cliente, setTipo_cliente] = useState('');
     const [forma_pago, setForma_pago] = useState('');
@@ -60,9 +61,20 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
       }
     ];
   
+    const formaPago = [
+      {
+        forma_pago: 1,
+        nombre: 'Credito'
+      },
+      {
+        forma_pago: 1,
+        nombre: 'Contado'
+      }
+    ];
+  
     useEffect(() => {
-        if (cliente !== null && cliente !== undefined) {
-            console.log(cliente, 'test')
+      if (cliente !== null && cliente !== undefined) {
+            setCliente_id(cliente.cliente_id)
             setCodigo_interno(cliente.codigo_interno);
             setTipo_cliente(cliente.tipo_cliente);
             setForma_pago(cliente.forma_pago);
@@ -87,6 +99,7 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
             setFecha_modifico(cliente.fecha_modifico);
             setUsuario_modifico(cliente.usuario_modifico);
         } else {
+            setCliente_id(0);
             setCodigo_interno('');
             setTipo_cliente('');
             setForma_pago('');
@@ -211,6 +224,7 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
                 setLoading(true);
                 let path = cliente ? '/maintenance/updateCliente' : '/maintenance/createCliente';
                 const payload = {
+                    cliente_id,
                     codigo_interno,
                     tipo_cliente,
                     forma_pago,
@@ -228,7 +242,7 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
                     correo,
                     saldo,
                     limite_credito,
-                    estado: estado === true ? '1' : '2',
+                    estado: estado === true ? '1' : '0',
                     comentario,
                     fecha_creo,
                     usuario_creo,
@@ -237,11 +251,14 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
                 };
 
                 const response = await api.post(path, payload);
-                console.log(response)
                 if (response.data.status) {
                     handleClose();
                     setReload(true)
-                    GlobalAlert.showSuccess('Registro creado correctamente');
+                    if (cliente == null || cliente == undefined) {
+                      GlobalAlert.showSuccess('Registro creado correctamente');
+                    } else {
+                      GlobalAlert.showSuccess('Registro actualizado correctamente');
+                    }
                 } else {
                     GlobalAlert.showErrorModal('Error: ', response.data.message);
                 }
@@ -295,15 +312,20 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
               </FormControl>
             </Grid>
             <Grid item xs={6}>
-              <TextField
-                label="Forma Pago"
-                value={forma_pago}
-                onChange={(e) => setForma_pago(e.target.value)}
-                fullWidth
-                error={Boolean(errors.forma_pago)}
-                helperText={errors.forma_pago}
-                sx={{ mt: 2 }}
-              />
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <InputLabel>Forma Pago</InputLabel>
+                <Select
+                  value={forma_pago}
+                  onChange={(e) => setForma_pago(e.target.value)}
+                  error={Boolean(errors.forma_pago)}
+                >
+                  {formaPago.map((tipo) => (
+                    <MenuItem key={tipo.forma_pago} value={tipo.forma_pago}>
+                      {tipo.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -482,6 +504,24 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
                 sx={{ mt: 2 }}
               />
             </Grid>
+
+            {cliente && (
+              <Grid item xs={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={estado}
+                      onChange={(e) => setEstado(e.target.checked)}
+                      name="estado"
+                      color="primary"
+                    />
+                  }
+                  label={estado ? "Activo" : "Inactivo"}
+                  sx={{ mt: 2 }}
+                />
+                </Grid>
+            )}
+
             <Grid item xs={12}>
               <TextField
                 label="Comentario"

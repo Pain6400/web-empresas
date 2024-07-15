@@ -79,7 +79,7 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
           identidad,
           telefono,
           correo,
-          estado: estado === true ? '1' : '2'
+          estado: estado === true ? '1' : '0'
         };
 
         if (usuario == null) {

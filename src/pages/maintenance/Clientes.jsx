@@ -94,7 +94,7 @@ const Clientes = () => {
       <ModalCliente
         open={openClienteModal}
         handleClose={() => setOpenClienteModal(false)}
-        Cliente={selectedCliente}
+        cliente={selectedCliente}
         setReload={setReload}
       />
     </div>
