@@ -10,11 +10,13 @@ const Clientes = () => {
   const [clientes, setClientes] = useState([]);
   const [selectedCliente, setSelectedCliente] = useState(null);
   const [openClienteModal, setOpenClienteModal] = useState(false);
+  const [reload, setReload] = useState(false);
   const { setIsLoading } = useContext(LoadingContext);
-  
+
   useEffect(() => {
     fetchClientes();
-  }, []);
+    setReload(false)
+  }, [reload]);
 
   const fetchClientes = async () => {
     setIsLoading(true)
@@ -63,16 +65,16 @@ const Clientes = () => {
           </TableHead>
             <TableBody>
                 {Array.isArray(clientes) && clientes.length > 0 ? (
-                    clientes.map((Cliente) => (
-                        <TableRow key={Cliente.Cliente_id}>
-                            <TableCell>{Cliente.Cliente_id}</TableCell>
+                    clientes.map((Cliente ) => (
+                        <TableRow key={Cliente.cliente_id}>
+                            <TableCell>{Cliente.cliente_id}</TableCell>
                             <TableCell>{Cliente.codigo_interno}</TableCell>
                             <TableCell>{Cliente.primer_nombre || Cliente.segundo_nombre || Cliente.primer_apellido || Cliente.segundo_apellido}</TableCell>
                             <TableCell>{Cliente.numero_identidad}</TableCell>
                             <TableCell>{Cliente.rtn}</TableCell>
                             <TableCell>{Cliente.telefono}</TableCell>
                             <TableCell>{Cliente.correo}</TableCell>
-                            <TableCell>{Cliente.estado === '1' ? 'Activo' : 'Inactivo'}</TableCell>
+                            <TableCell>{Cliente.estado == '1' ? 'Activo' : 'Inactivo'}</TableCell>
                             <TableCell>
                                 <IconButton onClick={() => { setSelectedCliente(Cliente); setOpenClienteModal(true); }}>
                                     <Edit />
@@ -93,8 +95,7 @@ const Clientes = () => {
         open={openClienteModal}
         handleClose={() => setOpenClienteModal(false)}
         Cliente={selectedCliente}
-        Clientes={Clientes}
-        setClientes={setClientes}
+        setReload={setReload}
       />
     </div>
   );

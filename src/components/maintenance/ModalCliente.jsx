@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button, Divider, FormControlLabel, Switch, Grid } from '@mui/material';
+import { Modal, Box, TextField, Divider, FormControl, Switch, Grid, InputLabel, Select, MenuItem } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import api from '../../components/axiosConfig';
 import GlobalAlert from '../../components/GlobalAlert';
@@ -18,7 +18,7 @@ const style = {
     overflow: 'auto',
   };
 
-const ModalCliente = ({ open, handleClose, cliente, clientes, setClientes }) => {
+const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
     const [codigo_interno, setCodigo_interno] = useState('');
     const [tipo_cliente, setTipo_cliente] = useState('');
     const [forma_pago, setForma_pago] = useState('');
@@ -45,6 +45,21 @@ const ModalCliente = ({ open, handleClose, cliente, clientes, setClientes }) => 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
+    const [paises, setPaises] = useState([]);
+    const [departamentos, setDepartamentos] = useState([]);
+    const [municipios, setMunicipios] = useState([]);
+
+    const tipos = [
+      {
+        tipo_cliente: 'N',
+        nombre: 'Natural'
+      },
+      {
+        tipo_cliente: 'J',
+        nombre: 'Judicial'
+      }
+    ];
+  
     useEffect(() => {
         if (cliente !== null && cliente !== undefined) {
             console.log(cliente, 'test')
@@ -98,6 +113,50 @@ const ModalCliente = ({ open, handleClose, cliente, clientes, setClientes }) => 
         }
     }, [cliente]);
 
+    useEffect(() => {
+      const fetchPaises = async () => {
+        try {
+          const response = await api.get('/maintenance/getPaises');
+          setPaises(response.data.paises);
+        } catch (error) {
+          console.error("Error fetching paises: ", error);
+        }
+      };
+  
+      fetchPaises();
+    }, []);
+  
+    useEffect(() => {
+      const fetchDepartamentos = async () => {
+        try {
+          if (pais_id) {
+            const response = await api.get(`maintenance/getDepartamentos/${pais_id}`);
+            setDepartamentos(response.data.departamentos);
+            setMunicipios([]);
+          }
+        } catch (error) {
+          console.error("Error fetching departamentos: ", error);
+        }
+      };
+  
+      fetchDepartamentos();
+    }, [pais_id]);
+  
+    useEffect(() => {
+      const fetchMunicipios = async () => {
+        try {
+          if (departamento_id) {
+            const response = await api.get(`maintenance/getMunicipios/${pais_id}/${departamento_id}`);
+            setMunicipios(response.data.municipios);
+          }
+        } catch (error) {
+          console.error("Error fetching municipios: ", error);
+        }
+      };
+  
+      fetchMunicipios();
+    }, [departamento_id]);
+
     const handleSubmit = async () => {
         const validationErrors = {};
 
@@ -150,7 +209,7 @@ const ModalCliente = ({ open, handleClose, cliente, clientes, setClientes }) => 
         if (Object.keys(validationErrors).length === 0) {
             try {
                 setLoading(true);
-                let path = cliente ? '/clientes/updateCliente' : '/clientes/createCliente';
+                let path = cliente ? '/maintenance/updateCliente' : '/maintenance/createCliente';
                 const payload = {
                     codigo_interno,
                     tipo_cliente,
@@ -178,18 +237,10 @@ const ModalCliente = ({ open, handleClose, cliente, clientes, setClientes }) => 
                 };
 
                 const response = await api.post(path, payload);
-
+                console.log(response)
                 if (response.data.status) {
                     handleClose();
-                    if (cliente !== null) {
-                        const updatedClientes = clientes.map(item =>
-                            item.cliente_id === cliente.cliente_id ? { ...item, ...payload } : item
-                        );
-                        setClientes(updatedClientes);
-                    } else {
-                        setClientes([...clientes, { cliente_id: response.data.cliente_id, ...payload }]);
-                    }
-
+                    setReload(true)
                     GlobalAlert.showSuccess('Registro creado correctamente');
                 } else {
                     GlobalAlert.showErrorModal('Error: ', response.data.message);
@@ -210,222 +261,250 @@ const ModalCliente = ({ open, handleClose, cliente, clientes, setClientes }) => 
     };
 
     return (
-        <Modal open={open} onClose={handleClose}>
-      <Box sx={style}>
-        <h3>{cliente ? "Editar Cliente" : "Nuevo Cliente"}</h3>
-        <Divider />
+      <Modal open={open} onClose={handleClose}>
+        <Box sx={style}>
+          <h3>{cliente ? "Editar Cliente" : "Nuevo Cliente"}</h3>
+          <Divider />
 
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <TextField
-              label="Código Interno"
-              value={codigo_interno}
-              onChange={(e) => setCodigo_interno(e.target.value)}
-              fullWidth
-              error={Boolean(errors.codigo_interno)}
-              helperText={errors.codigo_interno}
-              sx={{ mt: 2 }}
-            />
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <TextField
+                label="Código Interno"
+                value={codigo_interno}
+                onChange={(e) => setCodigo_interno(e.target.value)}
+                fullWidth
+                error={Boolean(errors.codigo_interno)}
+                helperText={errors.codigo_interno}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <InputLabel>Tipo Cliente</InputLabel>
+                <Select
+                  value={tipo_cliente}
+                  onChange={(e) => setTipo_cliente(e.target.value)}
+                  error={Boolean(errors.tipo_cliente)}
+                >
+                  {tipos.map((tipo) => (
+                    <MenuItem key={tipo.tipo_cliente} value={tipo.tipo_cliente}>
+                      {tipo.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Forma Pago"
+                value={forma_pago}
+                onChange={(e) => setForma_pago(e.target.value)}
+                fullWidth
+                error={Boolean(errors.forma_pago)}
+                helperText={errors.forma_pago}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Número Identidad"
+                value={numero_identidad}
+                onChange={(e) => setNumero_identidad(e.target.value)}
+                fullWidth
+                error={Boolean(errors.numero_identidad)}
+                helperText={errors.numero_identidad}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="RTN"
+                value={rtn}
+                onChange={(e) => setRtn(e.target.value)}
+                fullWidth
+                error={Boolean(errors.rtn)}
+                helperText={errors.rtn}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Primer Nombre"
+                value={primer_nombre}
+                onChange={(e) => setPrimer_nombre(e.target.value)}
+                fullWidth
+                error={Boolean(errors.primer_nombre)}
+                helperText={errors.primer_nombre}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Segundo Nombre"
+                value={segundo_nombre}
+                onChange={(e) => setSegundo_nombre(e.target.value)}
+                fullWidth
+                error={Boolean(errors.segundo_nombre)}
+                helperText={errors.segundo_nombre}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Primer Apellido"
+                value={primer_apellido}
+                onChange={(e) => setPrimer_apellido(e.target.value)}
+                fullWidth
+                error={Boolean(errors.primer_apellido)}
+                helperText={errors.primer_apellido}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Segundo Apellido"
+                value={segundo_apellido}
+                onChange={(e) => setSegundo_apellido(e.target.value)}
+                fullWidth
+                error={Boolean(errors.segundo_apellido)}
+                helperText={errors.segundo_apellido}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <InputLabel>País</InputLabel>
+                <Select
+                  value={pais_id}
+                  onChange={(e) => setPais_id(e.target.value)}
+                  error={Boolean(errors.pais_id)}
+                >
+                  {paises.map((pais) => (
+                    <MenuItem key={pais.pais_id} value={pais.pais_id}>
+                      {pais.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <InputLabel>Departamento</InputLabel>
+                <Select
+                  value={departamento_id}
+                  onChange={(e) => setDepartamento_id(e.target.value)}
+                  error={Boolean(errors.departamento_id)}
+                  disabled={!pais_id}
+                >
+                  {departamentos.map((departamento) => (
+                    <MenuItem
+                      key={departamento.departamento_id}
+                      value={departamento.departamento_id}
+                    >
+                      {departamento.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <InputLabel>Municipio</InputLabel>
+                <Select
+                  value={municipio_id}
+                  onChange={(e) => setMunicipio_id(e.target.value)}
+                  error={Boolean(errors.municipio_id)}
+                  disabled={!departamento_id}
+                >
+                  {municipios.map((municipio) => (
+                    <MenuItem
+                      key={municipio.municipio_id}
+                      value={municipio.municipio_id}
+                    >
+                      {municipio.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Dirección"
+                value={direccion}
+                onChange={(e) => setDireccion(e.target.value)}
+                fullWidth
+                error={Boolean(errors.direccion)}
+                helperText={errors.direccion}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Teléfono"
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+                fullWidth
+                error={Boolean(errors.telefono)}
+                helperText={errors.telefono}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Correo"
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
+                fullWidth
+                error={Boolean(errors.correo)}
+                helperText={errors.correo}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Saldo"
+                value={saldo}
+                onChange={(e) => setSaldo(e.target.value)}
+                fullWidth
+                error={Boolean(errors.saldo)}
+                helperText={errors.saldo}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Límite Crédito"
+                value={limite_credito}
+                onChange={(e) => setLimite_credito(e.target.value)}
+                fullWidth
+                error={Boolean(errors.limite_credito)}
+                helperText={errors.limite_credito}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Comentario"
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+                fullWidth
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <LoadingButton
+                onClick={handleSubmit}
+                loading={loading}
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+              >
+                Guardar
+              </LoadingButton>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Tipo Cliente"
-              value={tipo_cliente}
-              onChange={(e) => setTipo_cliente(e.target.value)}
-              fullWidth
-              error={Boolean(errors.tipo_cliente)}
-              helperText={errors.tipo_cliente}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Forma Pago"
-              value={forma_pago}
-              onChange={(e) => setForma_pago(e.target.value)}
-              fullWidth
-              error={Boolean(errors.forma_pago)}
-              helperText={errors.forma_pago}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Número Identidad"
-              value={numero_identidad}
-              onChange={(e) => setNumero_identidad(e.target.value)}
-              fullWidth
-              error={Boolean(errors.numero_identidad)}
-              helperText={errors.numero_identidad}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="RTN"
-              value={rtn}
-              onChange={(e) => setRtn(e.target.value)}
-              fullWidth
-              error={Boolean(errors.rtn)}
-              helperText={errors.rtn}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Primer Nombre"
-              value={primer_nombre}
-              onChange={(e) => setPrimer_nombre(e.target.value)}
-              fullWidth
-              error={Boolean(errors.primer_nombre)}
-              helperText={errors.primer_nombre}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Segundo Nombre"
-              value={segundo_nombre}
-              onChange={(e) => setSegundo_nombre(e.target.value)}
-              fullWidth
-              error={Boolean(errors.segundo_nombre)}
-              helperText={errors.segundo_nombre}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Primer Apellido"
-              value={primer_apellido}
-              onChange={(e) => setPrimer_apellido(e.target.value)}
-              fullWidth
-              error={Boolean(errors.primer_apellido)}
-              helperText={errors.primer_apellido}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Segundo Apellido"
-              value={segundo_apellido}
-              onChange={(e) => setSegundo_apellido(e.target.value)}
-              fullWidth
-              error={Boolean(errors.segundo_apellido)}
-              helperText={errors.segundo_apellido}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="País ID"
-              value={pais_id}
-              onChange={(e) => setPais_id(e.target.value)}
-              fullWidth
-              error={Boolean(errors.pais_id)}
-              helperText={errors.pais_id}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Departamento ID"
-              value={departamento_id}
-              onChange={(e) => setDepartamento_id(e.target.value)}
-              fullWidth
-              error={Boolean(errors.departamento_id)}
-              helperText={errors.departamento_id}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Municipio ID"
-              value={municipio_id}
-              onChange={(e) => setMunicipio_id(e.target.value)}
-              fullWidth
-              error={Boolean(errors.municipio_id)}
-              helperText={errors.municipio_id}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Dirección"
-              value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}
-              fullWidth
-              error={Boolean(errors.direccion)}
-              helperText={errors.direccion}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Teléfono"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
-              fullWidth
-              error={Boolean(errors.telefono)}
-              helperText={errors.telefono}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Correo"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              fullWidth
-              error={Boolean(errors.correo)}
-              helperText={errors.correo}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Saldo"
-              value={saldo}
-              onChange={(e) => setSaldo(e.target.value)}
-              fullWidth
-              error={Boolean(errors.saldo)}
-              helperText={errors.saldo}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Límite Crédito"
-              value={limite_credito}
-              onChange={(e) => setLimite_credito(e.target.value)}
-              fullWidth
-              error={Boolean(errors.limite_credito)}
-              helperText={errors.limite_credito}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Comentario"
-              value={comentario}
-              onChange={(e) => setComentario(e.target.value)}
-              fullWidth
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <LoadingButton
-              onClick={handleSubmit}
-              loading={loading}
-              variant="contained"
-              color="primary"
-              sx={{ mt: 2 }}
-            >
-              Guardar
-            </LoadingButton>
-          </Grid>
-        </Grid>
-      </Box>
-        </Modal>
+        </Box>
+      </Modal>
     );
 };
 

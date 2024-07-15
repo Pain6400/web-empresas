@@ -85,7 +85,7 @@ const ModalUsuario = ({ open, handleClose, usuario, usuarios, setUsuarios }) => 
         if (usuario == null) {
           payload.password = password;
         }
-        console.log(payload)
+
         const response = await api.post(path, payload);
 
         if (response.data.status) {
