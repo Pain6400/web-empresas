@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Dashboard, Assignment, Group, ExpandLess, ExpandMore, Settings, PersonSearch, VerifiedUser } from '@mui/icons-material';
+import { Dashboard, Assignment, Group, ExpandLess, ExpandMore, Settings, PersonSearch, VerifiedUser, Inventory } from '@mui/icons-material';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
 import logo from '../../assets/logo.png'; 
 import { UserContext } from '../../context/UserContext';
@@ -38,6 +38,7 @@ const Sidebar = () => {
       '/seguridad/usuarios': 'seguridad',
       '/seguridad/permisos': 'seguridad',
       '/mantenimientos/clientes': 'clientes',
+      '/mantenimientos/bodegas': 'bodegas',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -108,6 +109,15 @@ const Sidebar = () => {
                       <Group style={{ color: 'white' }} />
                     </ListItemIcon>
                     <ListItemText primary="Clientes" />
+                  </ListItemButton>
+                )}
+                {/* Bodegas */}
+                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['Bodegas'])) && (
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/bodegas" selected={location.pathname === '/mantenimientos/bodegas'}>
+                    <ListItemIcon>
+                      <Inventory style={{ color: 'white' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Bodegas" />
                   </ListItemButton>
                 )}
               </List>
