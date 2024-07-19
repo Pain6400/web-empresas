@@ -19,6 +19,7 @@ const style = {
 };
 
 const ModalBodega = ({ open, handleClose, bodega, setReload }) => {
+    const [bodega_id, setBodega_id] = useState('');
     const [nombre, setNombre] = useState('');
     const [estado, setEstado] = useState(false);
     const [principal, setPrincipal] = useState(false);
@@ -27,6 +28,7 @@ const ModalBodega = ({ open, handleClose, bodega, setReload }) => {
 
     useEffect(() => {
         if (bodega !== null && bodega !== undefined) {
+            setBodega_id(bodega.bodega_id)
             setNombre(bodega.nombre);
             setEstado(!!parseInt(bodega.estado, 10));
             setPrincipal(!!parseInt(bodega.principal, 10));
@@ -49,6 +51,7 @@ const ModalBodega = ({ open, handleClose, bodega, setReload }) => {
                 setLoading(true);
                 let path = bodega ? '/maintenance/updateBodega' : '/maintenance/createBodega';
                 const payload = {
+                    bodega_id,
                     nombre,
                     estado: estado === true ? '1' : '0',
                     principal: principal === true ? '1' : '0'
