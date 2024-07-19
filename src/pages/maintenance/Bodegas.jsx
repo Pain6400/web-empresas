@@ -52,7 +52,6 @@ const Bodegas = () => {
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>Empresa ID</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Principal</TableCell>
@@ -64,7 +63,6 @@ const Bodegas = () => {
               bodegas.map((bodega) => (
                 <TableRow key={bodega.bodega_id}>
                   <TableCell>{bodega.bodega_id}</TableCell>
-                  <TableCell>{bodega.empresa_id}</TableCell>
                   <TableCell>{bodega.nombre}</TableCell>
                   <TableCell>{bodega.estado === 1 ? 'Activo' : 'Inactivo'}</TableCell>
                   <TableCell>{bodega.principal === 1 ? 'Sí' : 'No'}</TableCell>

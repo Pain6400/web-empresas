@@ -19,48 +19,27 @@ const style = {
 };
 
 const ModalBodega = ({ open, handleClose, bodega, setReload }) => {
-    const [bodega_id, setBodega_id] = useState(0);
-    const [empresa_id, setEmpresa_id] = useState('');
     const [nombre, setNombre] = useState('');
     const [estado, setEstado] = useState(false);
     const [principal, setPrincipal] = useState(false);
-    const [fecha_creo, setFecha_creo] = useState('');
-    const [usuario_creo, setUsuario_creo] = useState('');
-    const [fecha_modifico, setFecha_modifico] = useState('');
-    const [usuario_modifico, setUsuario_modifico] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (bodega !== null && bodega !== undefined) {
-            setBodega_id(bodega.bodega_id);
-            setEmpresa_id(bodega.empresa_id);
             setNombre(bodega.nombre);
             setEstado(!!parseInt(bodega.estado, 10));
             setPrincipal(!!parseInt(bodega.principal, 10));
-            setFecha_creo(bodega.fecha_creo);
-            setUsuario_creo(bodega.usuario_creo);
-            setFecha_modifico(bodega.fecha_modifico);
-            setUsuario_modifico(bodega.usuario_modifico);
         } else {
-            setBodega_id(0);
-            setEmpresa_id('');
             setNombre('');
             setEstado(false);
             setPrincipal(false);
-            setFecha_creo('');
-            setUsuario_creo('');
-            setFecha_modifico('');
-            setUsuario_modifico('');
         }
     }, [bodega]);
 
     const handleSubmit = async () => {
         const validationErrors = {};
 
-        if (!empresa_id) {
-            validationErrors.empresa_id = 'El ID de la empresa es obligatorio';
-        }
         if (!nombre) {
             validationErrors.nombre = 'El nombre es obligatorio';
         }
@@ -70,15 +49,9 @@ const ModalBodega = ({ open, handleClose, bodega, setReload }) => {
                 setLoading(true);
                 let path = bodega ? '/maintenance/updateBodega' : '/maintenance/createBodega';
                 const payload = {
-                    bodega_id,
-                    empresa_id,
                     nombre,
                     estado: estado === true ? '1' : '0',
-                    principal: principal === true ? '1' : '0',
-                    fecha_creo,
-                    usuario_creo,
-                    fecha_modifico,
-                    usuario_modifico
+                    principal: principal === true ? '1' : '0'
                 };
 
                 const response = await api.post(path, payload);
@@ -115,17 +88,6 @@ const ModalBodega = ({ open, handleClose, bodega, setReload }) => {
                 <Divider />
 
                 <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                        <TextField
-                            label="ID Empresa"
-                            value={empresa_id}
-                            onChange={(e) => setEmpresa_id(e.target.value)}
-                            fullWidth
-                            error={Boolean(errors.empresa_id)}
-                            helperText={errors.empresa_id}
-                            sx={{ mt: 2 }}
-                        />
-                    </Grid>
                     <Grid item xs={6}>
                         <TextField
                             label="Nombre"
