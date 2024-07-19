@@ -16,6 +16,7 @@ import Permisos from './pages/security/Permisos'
 import Usuarios from './pages/security/Usuarios'
 import Clientes from './pages/maintenance/Clientes'
 import Bodegas from './pages/maintenance/Bodegas'
+import UnidadesMedida from './pages/maintenance/UnidadesMedida'
 
 //
 import { UserProvider, UserContext } from './context/UserContext';
@@ -109,6 +110,7 @@ const AppContent = () => {
                 <Route path="/seguridad/permisos" element={<PrivateRoute><Permisos /></PrivateRoute>} />               
                 <Route path="/mantenimientos/clientes" element={<PrivateRoute><Clientes /></PrivateRoute>} />               
                 <Route path="/mantenimientos/bodegas" element={<PrivateRoute><Bodegas /></PrivateRoute>} />               
+                <Route path="/mantenimientos/unidadMedida" element={<PrivateRoute><UnidadesMedida /></PrivateRoute>} />               
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>

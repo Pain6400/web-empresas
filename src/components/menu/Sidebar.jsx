@@ -39,6 +39,7 @@ const Sidebar = () => {
       '/seguridad/permisos': 'seguridad',
       '/mantenimientos/clientes': 'clientes',
       '/mantenimientos/bodegas': 'bodegas',
+      '/mantenimientos/unidadMedida': 'unidadMedida',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -118,6 +119,15 @@ const Sidebar = () => {
                       <Inventory style={{ color: 'white' }} />
                     </ListItemIcon>
                     <ListItemText primary="Bodegas" />
+                  </ListItemButton>
+                )}
+                {/* Unidad Medida */}
+                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['UnidadesMedidas'])) && (
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/unidadMedida" selected={location.pathname === '/mantenimientos/unidadMedida'}>
+                    <ListItemIcon>
+                      <Inventory style={{ color: 'white' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Unidad Medida" />
                   </ListItemButton>
                 )}
               </List>
