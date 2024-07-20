@@ -1,6 +1,9 @@
 import React, { useState, useContext, useEffect  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Dashboard, Assignment, Group, ExpandLess, ExpandMore, Settings, PersonSearch, VerifiedUser, Inventory } from '@mui/icons-material';
+import {
+  Dashboard, Assignment, Group, 
+  ExpandLess, ExpandMore, Settings, PersonSearch, VerifiedUser, Inventory, Payments
+} from '@mui/icons-material';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
 import logo from '../../assets/logo.png'; 
 import { UserContext } from '../../context/UserContext';
@@ -40,6 +43,7 @@ const Sidebar = () => {
       '/mantenimientos/clientes': 'clientes',
       '/mantenimientos/bodegas': 'bodegas',
       '/mantenimientos/unidadMedida': 'unidadMedida',
+      '/mantenimientos/ivs': 'ivs',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -128,6 +132,15 @@ const Sidebar = () => {
                       <Inventory style={{ color: 'white' }} />
                     </ListItemIcon>
                     <ListItemText primary="Unidad Medida" />
+                  </ListItemButton>
+                )}
+                {/* IVS */}
+                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['IVS'])) && (
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/ivs" selected={location.pathname === '/mantenimientos/ivs'}>
+                    <ListItemIcon>
+                      <Payments style={{ color: 'white' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="IVS" />
                   </ListItemButton>
                 )}
               </List>
