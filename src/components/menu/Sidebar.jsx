@@ -40,10 +40,10 @@ const Sidebar = () => {
       '/seguridad/perfiles': 'seguridad',
       '/seguridad/usuarios': 'seguridad',
       '/seguridad/permisos': 'seguridad',
-      '/mantenimientos/clientes': 'clientes',
-      '/mantenimientos/bodegas': 'bodegas',
-      '/mantenimientos/unidadMedida': 'unidadMedida',
-      '/mantenimientos/ivs': 'ivs',
+      '/mantenimientos/clientes': 'mantenimientos',
+      '/mantenimientos/bodegas': 'mantenimientos',
+      '/mantenimientos/unidadMedida': 'mantenimientos',
+      '/mantenimientos/ivs': 'mantenimientos',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -141,6 +141,15 @@ const Sidebar = () => {
                       <Payments style={{ color: 'white' }} />
                     </ListItemIcon>
                     <ListItemText primary="IVS" />
+                  </ListItemButton>
+                )}
+                {/* Tipo Producto */}
+                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['TipoProducto'])) && (
+                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/tipoProducto" selected={location.pathname === '/mantenimientos/tipoProducto'}>
+                    <ListItemIcon>
+                      <Payments style={{ color: 'white' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="TipoProducto" />
                   </ListItemButton>
                 )}
               </List>
