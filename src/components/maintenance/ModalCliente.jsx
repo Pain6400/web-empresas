@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Divider, FormControl, Switch, Grid, InputLabel, Select, MenuItem, FormControlLabel } from '@mui/material';
+import { Modal, Box, TextField, Divider, FormControl, Switch, Grid, InputLabel, Select, MenuItem, FormControlLabel, DialogActions, Button } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import api from '../../components/axiosConfig';
 import GlobalAlert from '../../components/GlobalAlert';
@@ -519,7 +519,7 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
                   label={estado ? "Activo" : "Inactivo"}
                   sx={{ mt: 2 }}
                 />
-                </Grid>
+              </Grid>
             )}
 
             <Grid item xs={12}>
@@ -532,15 +532,18 @@ const ModalCliente = ({ open, handleClose, cliente, setReload }) => {
               />
             </Grid>
             <Grid item xs={12}>
-              <LoadingButton
-                onClick={handleSubmit}
-                loading={loading}
-                variant="contained"
-                color="primary"
-                sx={{ mt: 2 }}
-              >
-                Guardar
-              </LoadingButton>
+              <DialogActions>
+                <Button onClick={handleClose} color="primary">
+                  Cancelar
+                </Button>
+                <LoadingButton
+                  onClick={handleSubmit}
+                  loading={loading}
+                  color="primary"
+                >
+                  Guardar
+                </LoadingButton>
+              </DialogActions>
             </Grid>
           </Grid>
         </Box>
