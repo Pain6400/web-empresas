@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Dashboard, Assignment, Group, 
+  Dashboard, Assignment, Group, Calculate, Category, QrCode, HowToReg, Class,
   ExpandLess, ExpandMore, Settings, PersonSearch, VerifiedUser, Inventory, Payments
 } from '@mui/icons-material';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
@@ -45,6 +45,7 @@ const Sidebar = () => {
       '/mantenimientos/unidadMedida': 'mantenimientos',
       '/mantenimientos/ivs': 'mantenimientos',
       '/mantenimientos/proveedores': 'mantenimientos',
+      '/mantenimientos/clasificacionProducto': 'mantenimientos',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -175,7 +176,7 @@ const Sidebar = () => {
                     }
                   >
                     <ListItemIcon>
-                      <Inventory style={{ color: "white" }} />
+                      <Calculate style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="Unidad Medida" />
                   </ListItemButton>
@@ -207,12 +208,12 @@ const Sidebar = () => {
                     }
                   >
                     <ListItemIcon>
-                      <Payments style={{ color: "white" }} />
+                      <Category style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="TipoProducto" />
                   </ListItemButton>
                 )}
-                {/* Tipo Producto */}
+                {/* Proveedor */}
                 {(hasRoles(["Admin", "Mantenimientos"]) ||
                   hasPermission(["Proveedor"])) && (
                   <ListItemButton
@@ -224,11 +225,28 @@ const Sidebar = () => {
                     }
                   >
                     <ListItemIcon>
-                      <Payments style={{ color: "white" }} />
+                      <HowToReg style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="Proveedores" />
                   </ListItemButton>
                 )}
+                {/* Proveedor */}
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["ClasificacionProducto"])) && (
+                    <ListItemButton
+                      sx={{ pl: 4 }}
+                      component={Link}
+                      to="/mantenimientos/clasificacionProducto"
+                      selected={
+                        location.pathname === "/mantenimientos/clasificacionProducto"
+                      }
+                    >
+                      <ListItemIcon>
+                        <Class style={{ color: "white" }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Clasificacion Producto" />
+                    </ListItemButton>
+                  )}
               </List>
             </Collapse>
           </>
