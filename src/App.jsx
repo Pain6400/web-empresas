@@ -19,6 +19,7 @@ import Bodegas from './pages/maintenance/Bodegas'
 import UnidadesMedida from './pages/maintenance/UnidadesMedida'
 import ISVs from './pages/maintenance/ISVs'
 import TipoProducto from './pages/maintenance/TipoProducto'
+import Proveedores from './pages/maintenance/Proveedores'
 
 //
 import { UserProvider, UserContext } from './context/UserContext';
@@ -115,6 +116,7 @@ const AppContent = () => {
                 <Route path="/mantenimientos/unidadMedida" element={<PrivateRoute><UnidadesMedida /></PrivateRoute>} /> 
                 <Route path="/mantenimientos/ivs" element={<PrivateRoute><ISVs /></PrivateRoute>} />           
                 <Route path="/mantenimientos/tipoProducto" element={<PrivateRoute><TipoProducto /></PrivateRoute>} />           
+                <Route path="/mantenimientos/proveedores" element={<PrivateRoute><Proveedores /></PrivateRoute>} />           
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>

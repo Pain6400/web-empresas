@@ -44,6 +44,7 @@ const Sidebar = () => {
       '/mantenimientos/bodegas': 'mantenimientos',
       '/mantenimientos/unidadMedida': 'mantenimientos',
       '/mantenimientos/ivs': 'mantenimientos',
+      '/mantenimientos/proveedores': 'mantenimientos',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -56,37 +57,53 @@ const Sidebar = () => {
     }
   }, [location.pathname]);
   return (
-    <div style={{ width: '250px', background: '#0b40a8', height: '100vh', color: 'white' }}>
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <img 
-          src={logo}
-          alt="Company Logo" 
-          style={{ width: '100px' }}
-        />
+    <div
+      style={{
+        width: "250px",
+        background: "#0b40a8",
+        height: "100vh",
+        color: "white",
+      }}
+    >
+      <div style={{ padding: "20px", textAlign: "center" }}>
+        <img src={logo} alt="Company Logo" style={{ width: "100px" }} />
       </div>
-      <Divider style={{ backgroundColor: 'white' }} />
+      <Divider style={{ backgroundColor: "white" }} />
       <List>
-        <ListItemButton component={Link} to="/dashboard" selected={location.pathname === '/dashboard'}>
+        <ListItemButton
+          component={Link}
+          to="/dashboard"
+          selected={location.pathname === "/dashboard"}
+        >
           <ListItemIcon>
-            <Dashboard style={{ color: 'white' }} />
+            <Dashboard style={{ color: "white" }} />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemButton>
-        {hasRoles(['Admin']) && (
+        {hasRoles(["Admin"]) && (
           <>
-            <ListItemButton onClick={() => handleClick('tareas')}>
+            <ListItemButton onClick={() => handleClick("tareas")}>
               <ListItemIcon>
-                <Assignment style={{ color: 'white' }} />
+                <Assignment style={{ color: "white" }} />
               </ListItemIcon>
               <ListItemText primary="Tareas" />
-              {openSections.tareas ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+              {openSections.tareas ? (
+                <ExpandLess style={{ color: "white" }} />
+              ) : (
+                <ExpandMore style={{ color: "white" }} />
+              )}
             </ListItemButton>
             <Collapse in={openSections.tareas} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {(hasRoles(['Admin']) || hasPermission(['Cle'])) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/tasks" selected={location.pathname === '/tasks'}>
+                {(hasRoles(["Admin"]) || hasPermission(["Cle"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/tasks"
+                    selected={location.pathname === "/tasks"}
+                  >
                     <ListItemIcon>
-                      <Group style={{ color: 'white' }} />
+                      <Group style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="Clientes" />
                   </ListItemButton>
@@ -95,61 +112,121 @@ const Sidebar = () => {
             </Collapse>
           </>
         )}
-        
+
         {/* Mantenimientos */}
-        {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['Clientes'])) && (
+        {(hasRoles(["Admin", "Mantenimientos"]) ||
+          hasPermission(["Clientes"])) && (
           <>
-            <ListItemButton onClick={() => handleClick('mantenimientos')}>
+            <ListItemButton onClick={() => handleClick("mantenimientos")}>
               <ListItemIcon>
-                <Assignment style={{ color: 'white' }} />
+                <Assignment style={{ color: "white" }} />
               </ListItemIcon>
               <ListItemText primary="Mantenimientos" />
-              {openSections.mantenimientos ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
+              {openSections.mantenimientos ? (
+                <ExpandLess style={{ color: "white" }} />
+              ) : (
+                <ExpandMore style={{ color: "white" }} />
+              )}
             </ListItemButton>
-            <Collapse in={openSections.mantenimientos} timeout="auto" unmountOnExit>
+            <Collapse
+              in={openSections.mantenimientos}
+              timeout="auto"
+              unmountOnExit
+            >
               <List component="div" disablePadding>
-                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['Clientes'])) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/clientes" selected={location.pathname === '/mantenimientos/clientes'}>
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["Clientes"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/mantenimientos/clientes"
+                    selected={location.pathname === "/mantenimientos/clientes"}
+                  >
                     <ListItemIcon>
-                      <Group style={{ color: 'white' }} />
+                      <Group style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="Clientes" />
                   </ListItemButton>
                 )}
                 {/* Bodegas */}
-                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['Bodegas'])) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/bodegas" selected={location.pathname === '/mantenimientos/bodegas'}>
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["Bodegas"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/mantenimientos/bodegas"
+                    selected={location.pathname === "/mantenimientos/bodegas"}
+                  >
                     <ListItemIcon>
-                      <Inventory style={{ color: 'white' }} />
+                      <Inventory style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="Bodegas" />
                   </ListItemButton>
                 )}
                 {/* Unidad Medida */}
-                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['UnidadesMedidas'])) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/unidadMedida" selected={location.pathname === '/mantenimientos/unidadMedida'}>
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["UnidadesMedidas"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/mantenimientos/unidadMedida"
+                    selected={
+                      location.pathname === "/mantenimientos/unidadMedida"
+                    }
+                  >
                     <ListItemIcon>
-                      <Inventory style={{ color: 'white' }} />
+                      <Inventory style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="Unidad Medida" />
                   </ListItemButton>
                 )}
                 {/* IVS */}
-                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['IVS'])) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/ivs" selected={location.pathname === '/mantenimientos/ivs'}>
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["IVS"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/mantenimientos/ivs"
+                    selected={location.pathname === "/mantenimientos/ivs"}
+                  >
                     <ListItemIcon>
-                      <Payments style={{ color: 'white' }} />
+                      <Payments style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="IVS" />
                   </ListItemButton>
                 )}
                 {/* Tipo Producto */}
-                {(hasRoles(['Admin', 'Mantenimientos']) || hasPermission(['TipoProducto'])) && (
-                  <ListItemButton sx={{ pl: 4 }} component={Link} to="/mantenimientos/tipoProducto" selected={location.pathname === '/mantenimientos/tipoProducto'}>
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["TipoProducto"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/mantenimientos/tipoProducto"
+                    selected={
+                      location.pathname === "/mantenimientos/tipoProducto"
+                    }
+                  >
                     <ListItemIcon>
-                      <Payments style={{ color: 'white' }} />
+                      <Payments style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="TipoProducto" />
+                  </ListItemButton>
+                )}
+                {/* Tipo Producto */}
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["Proveedor"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/mantenimientos/proveedores"
+                    selected={
+                      location.pathname === "/mantenimientos/proveedores"
+                    }
+                  >
+                    <ListItemIcon>
+                      <Payments style={{ color: "white" }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Proveedores" />
                   </ListItemButton>
                 )}
               </List>
@@ -158,46 +235,65 @@ const Sidebar = () => {
         )}
 
         {/* Configuracion */}
-        {(hasRoles(['Admin']) || hasPermission(['usuarios','Perfil', 'Permisos', 'Clie'])) && (
-            <>
-              <ListItemButton onClick={() => handleClick('seguridad')}>
-                <ListItemIcon>
-                  <Settings style={{ color: 'white' }} />
-                </ListItemIcon>
-                <ListItemText primary="Seguridad" />
-                {openSections.seguridad ? <ExpandLess style={{ color: 'white' }} /> : <ExpandMore style={{ color: 'white' }} />}
-              </ListItemButton>
-              <Collapse in={openSections.seguridad} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                {(hasRoles(['Admin']) || hasPermission(['Usuario'])) && (
-                    <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/usuarios" selected={location.pathname === '/seguridad/usuarios'}>
-                      <ListItemIcon>
-                        <Group style={{ color: 'white' }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Usuarios" />
-                    </ListItemButton>
-                  )}
-                  {(hasRoles(['Admin']) || hasPermission(['Perfil'])) && (
-                    <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/perfiles" selected={location.pathname === '/seguridad/perfiles'}>
-                      <ListItemIcon>
-                        <PersonSearch style={{ color: 'white' }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Perfiles" />
-                    </ListItemButton>
-                  )}
-                  {(hasRoles(['Admin']) || hasPermission(['Permisos'])) && (
-                    <ListItemButton sx={{ pl: 4 }} component={Link} to="/seguridad/permisos" selected={location.pathname === '/seguridad/permisos'}>
-                      <ListItemIcon>
-                        <VerifiedUser style={{ color: 'white' }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Permisos" />
-                    </ListItemButton>
-                  )}
-                </List>
-              </Collapse>
-            </>
-          )
-        }
+        {(hasRoles(["Admin"]) ||
+          hasPermission(["usuarios", "Perfil", "Permisos", "Clie"])) && (
+          <>
+            <ListItemButton onClick={() => handleClick("seguridad")}>
+              <ListItemIcon>
+                <Settings style={{ color: "white" }} />
+              </ListItemIcon>
+              <ListItemText primary="Seguridad" />
+              {openSections.seguridad ? (
+                <ExpandLess style={{ color: "white" }} />
+              ) : (
+                <ExpandMore style={{ color: "white" }} />
+              )}
+            </ListItemButton>
+            <Collapse in={openSections.seguridad} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {(hasRoles(["Admin"]) || hasPermission(["Usuario"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/seguridad/usuarios"
+                    selected={location.pathname === "/seguridad/usuarios"}
+                  >
+                    <ListItemIcon>
+                      <Group style={{ color: "white" }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Usuarios" />
+                  </ListItemButton>
+                )}
+                {(hasRoles(["Admin"]) || hasPermission(["Perfil"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/seguridad/perfiles"
+                    selected={location.pathname === "/seguridad/perfiles"}
+                  >
+                    <ListItemIcon>
+                      <PersonSearch style={{ color: "white" }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Perfiles" />
+                  </ListItemButton>
+                )}
+                {(hasRoles(["Admin"]) || hasPermission(["Permisos"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/seguridad/permisos"
+                    selected={location.pathname === "/seguridad/permisos"}
+                  >
+                    <ListItemIcon>
+                      <VerifiedUser style={{ color: "white" }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Permisos" />
+                  </ListItemButton>
+                )}
+              </List>
+            </Collapse>
+          </>
+        )}
       </List>
     </div>
   );
