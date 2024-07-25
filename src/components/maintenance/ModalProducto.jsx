@@ -11,11 +11,33 @@ import {
   Grid,
   FormControlLabel,
   Switch,
+  Paper,
+  Typography,
+  CircularProgress
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import api from "../../components/axiosConfig";
 import GlobalAlert from "../../components/GlobalAlert";
 import { useDropzone } from 'react-dropzone';
+import { styled } from '@mui/system';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
+const DropzoneContainer = styled(Paper)(({ theme }) => ({
+  border: '2px dashed #ccc',
+  padding: theme.spacing(3),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  }
+}));
+
+const ImagePreview = styled('img')(({ theme }) => ({
+  maxWidth: '100%',
+  maxHeight: '200px',
+  marginTop: theme.spacing(2),
+}));
 
 const ModalProducto = ({ open, handleClose, producto, setReload }) => {
   const [codigoInterno, setCodigoInterno] = useState("");
@@ -33,8 +55,37 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
   const [existenciaGlobal, setExistenciaGlobal] = useState("");
   const [stockMinimo, setStockMinimo] = useState("");
   const [estado, setEstado] = useState(true);
+  const [fotoPreview, setFotoPreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const base64ToBlob = (base64, mimeType) => {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+  };
+
+  const fetchProducto = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.get(`/maintenance/getFotoProducto/${producto.producto_id}`);
+      const base64String = response.data.foto;
+      const blob = base64ToBlob(base64String, 'image/jpeg');
+      setFoto({
+        data: base64String,
+        preview: URL.createObjectURL(blob)
+      });
+    } catch (error) {
+      console.error('Error al cargar el producto:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (producto !== null && producto !== undefined) {
@@ -44,15 +95,16 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       setIsvId(producto.isv_id);
       setEspecificaciones(producto.especificaciones);
       setFoto(producto.foto);
-      setExento(producto.exento);
+      setExento(!!parseInt(producto.exento, 10));
       setCostoPromedio(producto.costo_promedio);
       setPrecioSinImpuesto(producto.precio_sin_impuesto);
       setPrecioConImpuesto(producto.precio_con_impuesto);
-      setAplicaDescuento(producto.aplica_descuento);
+      setAplicaDescuento(!!parseInt(producto.aplica_descuento, 10));
       setPorcentajeComision(producto.porcentaje_comision);
       setExistenciaGlobal(producto.existencia_global);
       setStockMinimo(producto.stock_minimo);
-      setEstado(producto.estado);
+      setEstado(!!parseInt(producto.estado, 10));
+      fetchProducto();
     } else {
       setCodigoInterno("");
       setTipoProductoId("");
@@ -70,17 +122,28 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       setStockMinimo("");
       setEstado(true);
     }
+
   }, [producto]);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      'image/jpeg': ['.jpeg', '.jpg'],
-      'image/png': ['.png'],
-    },
-    onDrop: (acceptedFiles) => {
-      setFoto(acceptedFiles[0]);
+    accept: 'image/*',
+    onDrop: acceptedFiles => {
+      setFoto(Object.assign(acceptedFiles[0], {
+        preview: URL.createObjectURL(acceptedFiles[0])
+      }));
     }
   });
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFoto(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFotoPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
 
   const handleSubmit = async () => {
@@ -235,10 +298,25 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <div {...getRootProps()} style={{ border: '2px dashed #ccc', padding: '20px', textAlign: 'center' }}>
-              <input {...getInputProps()} />
-              {foto ? <p>{foto.name}</p> : <p>Arrastra y suelta una imagen aquí, o haz clic para seleccionar una</p>}
+            <div>
+              {fotoPreview && <img src={fotoPreview} alt="Previsualización" width="200" />}
             </div>
+          </Grid>
+          <Grid item xs={12}>
+          <DropzoneContainer {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isLoading ? (
+                <CircularProgress />
+              ) : (
+                <>
+                  <CloudUploadIcon fontSize="large" />
+                  <Typography variant="body1">
+                    {foto ? foto.name : "Arrastra y suelta una imagen aquí, o haz clic para seleccionar una"}
+                  </Typography>
+                  {foto && <ImagePreview src={foto.preview} alt="Vista previa de la imagen" />}
+                </>
+              )}
+            </DropzoneContainer>
           </Grid>
           <Grid item xs={6}>
             <FormControlLabel
