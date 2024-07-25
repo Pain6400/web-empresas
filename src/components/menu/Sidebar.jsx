@@ -46,6 +46,7 @@ const Sidebar = () => {
       '/mantenimientos/ivs': 'mantenimientos',
       '/mantenimientos/proveedores': 'mantenimientos',
       '/mantenimientos/clasificacionProducto': 'mantenimientos',
+      '/mantenimientos/Productos': 'mantenimientos',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -233,20 +234,39 @@ const Sidebar = () => {
                 {/* Proveedor */}
                 {(hasRoles(["Admin", "Mantenimientos"]) ||
                   hasPermission(["ClasificacionProducto"])) && (
-                    <ListItemButton
-                      sx={{ pl: 4 }}
-                      component={Link}
-                      to="/mantenimientos/clasificacionProducto"
-                      selected={
-                        location.pathname === "/mantenimientos/clasificacionProducto"
-                      }
-                    >
-                      <ListItemIcon>
-                        <Class style={{ color: "white" }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Clasificacion Producto" />
-                    </ListItemButton>
-                  )}
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/mantenimientos/clasificacionProducto"
+                    selected={
+                      location.pathname ===
+                      "/mantenimientos/clasificacionProducto"
+                    }
+                  >
+                    <ListItemIcon>
+                      <Class style={{ color: "white" }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Clasificacion Producto" />
+                  </ListItemButton>
+                )}
+                {/* Productos */}
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["Productos"])) && (
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    component={Link}
+                    to="/mantenimientos/productos"
+                    selected={
+                      location.pathname ===
+                      "/mantenimientos/productos"
+                    }
+                  >
+                    <ListItemIcon>
+                      <Class style={{ color: "white" }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Productos" />
+                  </ListItemButton>
+                )}
               </List>
             </Collapse>
           </>
