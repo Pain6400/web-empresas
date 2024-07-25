@@ -55,7 +55,9 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
   const [existenciaGlobal, setExistenciaGlobal] = useState("");
   const [stockMinimo, setStockMinimo] = useState("");
   const [estado, setEstado] = useState(true);
-  const [fotoPreview, setFotoPreview] = useState(null);
+  const [unidadesMedidas, setUnidadesMedidas] = useState(null);
+  const [tipoProductos, setTipoProductos] = useState(null);
+  const [ISVs, setISVs] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -134,16 +136,38 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
     }
   });
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFoto(file);
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFotoPreview(reader.result);
+  useEffect(() => {
+    const fetchUnidadesMedidas = async () => {
+      try {
+        const response = await api.get(`maintenance/getUnidadesMedidas`);
+        setUnidadesMedidas(response.data.unidadesMedida);
+      } catch (error) {
+        console.error("Error fetching departamentos: ", error);
+      }
     };
-    reader.readAsDataURL(file);
-  };
+
+    const fetchTiposProductos = async () => {
+      try {
+        const response = await api.get(`maintenance/getTipoProductos`);
+        setTipoProductos(response.data.tipoProducto);
+      } catch (error) {
+        console.error("Error fetching departamentos: ", error);
+      }
+    };
+
+    const fetchIsvs = async () => {
+      try {
+        const response = await api.get(`maintenance/getISVs`);
+        setISVs(response.data.isvs);
+      } catch (error) {
+        console.error("Error fetching departamentos: ", error);
+      }
+    };
+
+    fetchUnidadesMedidas();
+    fetchTiposProductos();
+    fetchIsvs();
+  }, []);
 
 
   const handleSubmit = async () => {
@@ -160,6 +184,9 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
     }
     if (!isvId) {
       validationErrors.isv_id = "El ISV es obligatorio";
+    }
+    if (!isvId) {
+      validationErrors.foto  = "Foto es obligatorio";
     }
     if (!especificaciones) {
       validationErrors.especificaciones =
@@ -317,6 +344,11 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
                 </>
               )}
             </DropzoneContainer>
+            {errors.foto && (
+              <Typography color="error" variant="body2">
+                {errors.foto}
+              </Typography>
+            )}
           </Grid>
           <Grid item xs={6}>
             <FormControlLabel
