@@ -15,6 +15,7 @@ import {
 import LoadingButton from "@mui/lab/LoadingButton";
 import api from "../../components/axiosConfig";
 import GlobalAlert from "../../components/GlobalAlert";
+import { useDropzone } from 'react-dropzone';
 
 const ModalProducto = ({ open, handleClose, producto, setReload }) => {
   const [codigoInterno, setCodigoInterno] = useState("");
@@ -58,7 +59,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       setUnidadMedidaId("");
       setIsvId("");
       setEspecificaciones("");
-      setFoto("");
+      setFoto(null);
       setExento(false);
       setCostoPromedio("");
       setPrecioSinImpuesto("");
@@ -70,6 +71,17 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       setEstado(true);
     }
   }, [producto]);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      'image/jpeg': ['.jpeg', '.jpg'],
+      'image/png': ['.png'],
+    },
+    onDrop: (acceptedFiles) => {
+      setFoto(acceptedFiles[0]);
+    }
+  });
+
 
   const handleSubmit = async () => {
     const validationErrors = {};
@@ -89,9 +101,6 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
     if (!especificaciones) {
       validationErrors.especificaciones =
         "Las especificaciones son obligatorias";
-    }
-    if (!foto) {
-      validationErrors.foto = "La foto es obligatoria";
     }
     if (!costoPromedio) {
       validationErrors.costo_promedio = "El costo promedio es obligatorio";
@@ -119,37 +128,36 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         setLoading(true);
-        let path = producto
-          ? "/maintenance/updateProducto"
-          : "/maintenance/createProducto";
-        const payload = {
-          producto_id: producto?.producto_id,
-          codigo_interno: codigoInterno,
-          tipo_producto_id: tipoProductoId,
-          unidad_medida_id: unidadMedidaId,
-          isv_id: isvId,
-          especificaciones,
-          foto,
-          exento,
-          costo_promedio: parseFloat(costoPromedio) || null,
-          precio_sin_impuesto: parseFloat(precioSinImpuesto) || null,
-          precio_con_impuesto: parseFloat(precioConImpuesto) || null,
-          aplica_descuento,
-          porcentaje_comision: parseFloat(porcentajeComision) || null,
-          existencia_global: parseFloat(existenciaGlobal) || null,
-          stock_minimo: parseFloat(stockMinimo) || null,
-          estado,
-        };
+        const formData = new FormData();
+        formData.append("producto_id", producto?.producto_id);
+        formData.append("codigo_interno", codigoInterno);
+        formData.append("tipo_producto_id", tipoProductoId);
+        formData.append("unidad_medida_id", unidadMedidaId);
+        formData.append("isv_id", isvId);
+        formData.append("especificaciones", especificaciones);
+        if (foto) {
+          formData.append("foto", foto);
+        }
+        formData.append("exento", exento);
+        formData.append("costo_promedio", costoPromedio);
+        formData.append("precio_sin_impuesto", precioSinImpuesto);
+        formData.append("precio_con_impuesto", precioConImpuesto);
+        formData.append("aplica_descuento", aplicaDescuento);
+        formData.append("porcentaje_comision", porcentajeComision);
+        formData.append("existencia_global", existenciaGlobal);
+        formData.append("stock_minimo", stockMinimo);
+        formData.append("estado", estado);
 
-        const response = await api.post(path, payload);
+        const response = await api.post(producto ? "/maintenance/updateProducto" : "/maintenance/createProducto", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
         if (response.data.status) {
           handleClose();
           setReload(true);
-          if (!producto) {
-            GlobalAlert.showSuccess("Registro creado correctamente");
-          } else {
-            GlobalAlert.showSuccess("Registro actualizado correctamente");
-          }
+          GlobalAlert.showSuccess(producto ? "Registro actualizado correctamente" : "Registro creado correctamente");
         } else {
           GlobalAlert.showError("Error", response.data.message);
         }
@@ -176,7 +184,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       <Divider />
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 2 }}>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Código Interno"
@@ -186,7 +194,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.codigo_interno}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Tipo Producto ID"
@@ -196,7 +204,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.tipo_producto_id}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Unidad Medida ID"
@@ -206,7 +214,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.unidad_medida_id}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="ISV ID"
@@ -216,7 +224,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.isv_id}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Especificaciones"
@@ -227,14 +235,10 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Foto"
-              value={foto}
-              onChange={(e) => setFoto(e.target.value)}
-              error={Boolean(errors.foto)}
-              helperText={errors.foto}
-            />
+            <div {...getRootProps()} style={{ border: '2px dashed #ccc', padding: '20px', textAlign: 'center' }}>
+              <input {...getInputProps()} />
+              {foto ? <p>{foto.name}</p> : <p>Arrastra y suelta una imagen aquí, o haz clic para seleccionar una</p>}
+            </div>
           </Grid>
           <Grid item xs={6}>
             <FormControlLabel
@@ -250,7 +254,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               sx={{ mt: 2 }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Costo Promedio"
@@ -260,7 +264,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.costo_promedio}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Precio Sin Impuesto"
@@ -270,7 +274,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.precio_sin_impuesto}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Precio Con Impuesto"
@@ -294,7 +298,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               sx={{ mt: 2 }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Porcentaje Comision"
@@ -304,7 +308,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.porcentaje_comision}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Existencia Global"
@@ -314,7 +318,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.existencia_global}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
               label="Stock Mínimo"

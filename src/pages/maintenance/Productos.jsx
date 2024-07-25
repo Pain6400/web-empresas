@@ -54,6 +54,10 @@ const Producto = () => {
               <TableCell>ID</TableCell>
               <TableCell>Código Interno</TableCell>
               <TableCell>Nombre</TableCell>
+              <TableCell>Costo Promedio</TableCell>
+              <TableCell>Precio Sin Impuesto</TableCell>
+              <TableCell>Precio Con Impuesto</TableCell>
+              <TableCell>Estado</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
@@ -64,6 +68,10 @@ const Producto = () => {
                   <TableCell>{producto.producto_id}</TableCell>
                   <TableCell>{producto.codigo_interno}</TableCell>
                   <TableCell>{producto.nombre}</TableCell>
+                  <TableCell>{producto.costo_promedio}</TableCell>
+                  <TableCell>{producto.precio_sin_impuesto}</TableCell>
+                  <TableCell>{producto.precio_con_impuesto}</TableCell>
+                  <TableCell>{producto.estado == '1' ? 'Activo' : 'Inactivo'}</TableCell>
                   <TableCell>
                     <IconButton onClick={() => { setSelectedProducto(producto); setOpenProductoModal(true); }}>
                       <Edit />
@@ -73,7 +81,7 @@ const Producto = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} align="center">No hay datos disponibles</TableCell>
+                <TableCell colSpan={8} align="center">No hay datos disponibles</TableCell>
               </TableRow>
             )}
           </TableBody>
