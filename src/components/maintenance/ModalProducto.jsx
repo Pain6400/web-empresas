@@ -6,14 +6,17 @@ import {
   TextField,
   DialogActions,
   Button,
-  Box,
+  FormControl,
   Divider,
   Grid,
   FormControlLabel,
   Switch,
   Paper,
   Typography,
-  CircularProgress
+  CircularProgress,
+  Select,
+  InputLabel,
+  MenuItem
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import api from "../../components/axiosConfig";
@@ -45,6 +48,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
   const [unidadMedidaId, setUnidadMedidaId] = useState("");
   const [isvId, setIsvId] = useState("");
   const [especificaciones, setEspecificaciones] = useState("");
+  const [nombre, setNombre] = useState("");
   const [foto, setFoto] = useState("");
   const [exento, setExento] = useState(false);
   const [costoPromedio, setCostoPromedio] = useState("");
@@ -55,9 +59,9 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
   const [existenciaGlobal, setExistenciaGlobal] = useState("");
   const [stockMinimo, setStockMinimo] = useState("");
   const [estado, setEstado] = useState(true);
-  const [unidadesMedidas, setUnidadesMedidas] = useState(null);
-  const [tipoProductos, setTipoProductos] = useState(null);
-  const [ISVs, setISVs] = useState(null);
+  const [unidadesMedidas, setUnidadesMedidas] = useState([]);
+  const [tipoProductos, setTipoProductos] = useState([]);
+  const [ISVs, setISVs] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,11 +81,15 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
     try {
       const response = await api.get(`/maintenance/getFotoProducto/${producto.producto_id}`);
       const base64String = response.data.foto;
-      const blob = base64ToBlob(base64String, 'image/jpeg');
-      setFoto({
-        data: base64String,
-        preview: URL.createObjectURL(blob)
-      });
+
+      if (base64String) {
+        const blob = base64ToBlob(base64String, 'image/jpeg');
+        const previewUrl = URL.createObjectURL(blob);
+        const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+        setFoto(Object.assign({ file, preview: previewUrl }));
+      } else {
+        setFoto(null);
+      }
     } catch (error) {
       console.error('Error al cargar el producto:', error);
     } finally {
@@ -96,6 +104,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       setUnidadMedidaId(producto.unidad_medida_id);
       setIsvId(producto.isv_id);
       setEspecificaciones(producto.especificaciones);
+      setNombre(producto.nombre);
       setFoto(producto.foto);
       setExento(!!parseInt(producto.exento, 10));
       setCostoPromedio(producto.costo_promedio);
@@ -110,6 +119,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
     } else {
       setCodigoInterno("");
       setTipoProductoId("");
+      setNombre("");
       setUnidadMedidaId("");
       setIsvId("");
       setEspecificaciones("");
@@ -133,7 +143,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       setFoto(Object.assign(acceptedFiles[0], {
         preview: URL.createObjectURL(acceptedFiles[0])
       }));
-    }
+    },
   });
 
   useEffect(() => {
@@ -179,13 +189,16 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
     if (!tipoProductoId) {
       validationErrors.tipo_producto_id = "El tipo de producto es obligatorio";
     }
+    if (!nombre) {
+      validationErrors.nombre = "El nombre   de producto es obligatorio";
+    }
     if (!unidadMedidaId) {
       validationErrors.unidad_medida_id = "La unidad de medida es obligatoria";
     }
     if (!isvId) {
       validationErrors.isv_id = "El ISV es obligatorio";
     }
-    if (!isvId) {
+    if (!foto) {
       validationErrors.foto  = "Foto es obligatorio";
     }
     if (!especificaciones) {
@@ -219,15 +232,15 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       try {
         setLoading(true);
         const formData = new FormData();
+        console.log(foto)
         formData.append("producto_id", producto?.producto_id);
         formData.append("codigo_interno", codigoInterno);
         formData.append("tipo_producto_id", tipoProductoId);
+        formData.append("nombre", nombre);
         formData.append("unidad_medida_id", unidadMedidaId);
         formData.append("isv_id", isvId);
         formData.append("especificaciones", especificaciones);
-        if (foto) {
-          formData.append("foto", foto);
-        }
+        formData.append("foto", foto);
         formData.append("exento", exento);
         formData.append("costo_promedio", costoPromedio);
         formData.append("precio_sin_impuesto", precioSinImpuesto);
@@ -284,36 +297,57 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.codigo_interno}
             />
           </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Tipo Producto ID"
-              value={tipoProductoId}
-              onChange={(e) => setTipoProductoId(e.target.value)}
-              error={Boolean(errors.tipo_producto_id)}
-              helperText={errors.tipo_producto_id}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Unidad Medida ID"
-              value={unidadMedidaId}
-              onChange={(e) => setUnidadMedidaId(e.target.value)}
-              error={Boolean(errors.unidad_medida_id)}
-              helperText={errors.unidad_medida_id}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="ISV ID"
-              value={isvId}
-              onChange={(e) => setIsvId(e.target.value)}
-              error={Boolean(errors.isv_id)}
-              helperText={errors.isv_id}
-            />
-          </Grid>
+          <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={Boolean(errors.tipo_producto_id)}>
+                <InputLabel id="tipoProductoId-label">Tipo de Producto</InputLabel>
+                <Select
+                  labelId="tipoProductoId-label"
+                  value={tipoProductoId}
+                  onChange={(e) => setTipoProductoId(e.target.value)}
+                  label="Tipo de Producto"
+                >
+                  {tipoProductos.map((tipoProducto) => (
+                    <MenuItem key={tipoProducto.tipo_producto_id} value={tipoProducto.tipo_producto_id}>
+                      {tipoProducto.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={Boolean(errors.unidad_medida_id)}>
+                <InputLabel id="unidadMedidaId-label">Unidad de Medida</InputLabel>
+                <Select
+                  labelId="unidadMedidaId-label"
+                  value={unidadMedidaId}
+                  onChange={(e) => setUnidadMedidaId(e.target.value)}
+                  label="Unidad de Medida"
+                >
+                  {unidadesMedidas.map((unidadMedida) => (
+                    <MenuItem key={unidadMedida.unidad_medida_id} value={unidadMedida.unidad_medida_id}>
+                      {unidadMedida.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={Boolean(errors.isv_id)}>
+                <InputLabel id="isvId-label">ISV</InputLabel>
+                <Select
+                  labelId="isvId-label"
+                  value={isvId}
+                  onChange={(e) => setIsvId(e.target.value)}
+                  label="ISV"
+                >
+                  {ISVs.map((isv) => (
+                    <MenuItem key={isv.isv_id} value={isv.isv_id}>
+                      {isv.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           <Grid item xs={6}>
             <TextField
               fullWidth
@@ -324,10 +358,15 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               helperText={errors.especificaciones}
             />
           </Grid>
-          <Grid item xs={12}>
-            <div>
-              {fotoPreview && <img src={fotoPreview} alt="Previsualización" width="200" />}
-            </div>
+          <Grid item xs={6}>
+            <TextField
+              fullWidth
+              label="Nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              error={Boolean(errors.nombre)}
+              helperText={errors.nombre}
+            />
           </Grid>
           <Grid item xs={12}>
           <DropzoneContainer {...getRootProps()}>
