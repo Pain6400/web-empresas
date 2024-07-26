@@ -5,6 +5,7 @@ import { Edit } from '@mui/icons-material';
 import GlobalAlert from '../../components/GlobalAlert';
 import ModalCliente from '../../components/maintenance/ModalCliente';
 import { LoadingContext } from '../../context/LoadingContext';
+import { useHistory } from 'react-router-dom';
 
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -61,6 +62,7 @@ const Clientes = () => {
               <TableCell>Correo</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Acciones</TableCell>
+              <TableCell>Ver</TableCell>
             </TableRow>
           </TableHead>
             <TableBody>
@@ -78,9 +80,14 @@ const Clientes = () => {
                             <TableCell>
                                 <IconButton onClick={() => { setSelectedCliente(Cliente); setOpenClienteModal(true); }}>
                                     <Edit />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
+                          </IconButton>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="contained" color="primary" onClick={() => handleViewClick(Cliente.cliente_id)}>
+                            Ver
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     ))
                 ) : (
                     <TableRow>
