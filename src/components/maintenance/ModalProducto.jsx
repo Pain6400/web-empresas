@@ -86,7 +86,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
         const blob = base64ToBlob(base64String, 'image/jpeg');
         const previewUrl = URL.createObjectURL(blob);
         const file = new File([blob], "image.jpg", { type: "image/jpeg" });
-        setFoto(Object.assign({ file, preview: previewUrl }));
+        setFoto(Object.assign(file, { preview: previewUrl }));
       } else {
         setFoto(null);
       }
@@ -411,6 +411,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               onChange={(e) => setCostoPromedio(e.target.value)}
               error={Boolean(errors.costo_promedio)}
               helperText={errors.costo_promedio}
+              type="number"
             />
           </Grid>
           <Grid item xs={6}>
@@ -421,6 +422,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               onChange={(e) => setPrecioSinImpuesto(e.target.value)}
               error={Boolean(errors.precio_sin_impuesto)}
               helperText={errors.precio_sin_impuesto}
+              type="number"
             />
           </Grid>
           <Grid item xs={6}>
@@ -431,6 +433,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               onChange={(e) => setPrecioConImpuesto(e.target.value)}
               error={Boolean(errors.precio_con_impuesto)}
               helperText={errors.precio_con_impuesto}
+              type="number"
             />
           </Grid>
           <Grid item xs={6}>
@@ -455,6 +458,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               onChange={(e) => setPorcentajeComision(e.target.value)}
               error={Boolean(errors.porcentaje_comision)}
               helperText={errors.porcentaje_comision}
+              type="number"
             />
           </Grid>
           <Grid item xs={6}>
@@ -465,6 +469,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               onChange={(e) => setExistenciaGlobal(e.target.value)}
               error={Boolean(errors.existencia_global)}
               helperText={errors.existencia_global}
+              type="number"
             />
           </Grid>
           <Grid item xs={6}>
