@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Dashboard, Assignment, Group, Calculate, Category, QrCode, HowToReg, Class,
-  ExpandLess, ExpandMore, Settings, PersonSearch, VerifiedUser, Inventory, Payments
+  Dashboard, Assignment, Group, Calculate, Category, QrCode, HowToReg, Class, History,
+  ExpandLess, ExpandMore, Settings, PersonSearch, VerifiedUser, Inventory, Payments,
+  More
 } from '@mui/icons-material';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Divider  } from '@mui/material';
 import logo from '../../assets/logo.png'; 
@@ -46,7 +47,8 @@ const Sidebar = () => {
       '/mantenimientos/ivs': 'mantenimientos',
       '/mantenimientos/proveedores': 'mantenimientos',
       '/mantenimientos/clasificacionProducto': 'mantenimientos',
-      '/mantenimientos/Productos': 'mantenimientos',
+      '/mantenimientos/productos': 'mantenimientos',
+      '/mantenimientos/cAIHistorico': 'mantenimientos',
       // Agrega más rutas y secciones según sea necesario
     };
 
@@ -262,11 +264,28 @@ const Sidebar = () => {
                     }
                   >
                     <ListItemIcon>
-                      <Class style={{ color: "white" }} />
+                      <More style={{ color: "white" }} />
                     </ListItemIcon>
                     <ListItemText primary="Productos" />
                   </ListItemButton>
                 )}
+                {(hasRoles(["Admin", "Mantenimientos"]) ||
+                  hasPermission(["CAIHistorico"])) && (
+                    <ListItemButton
+                      sx={{ pl: 4 }}
+                      component={Link}
+                      to="/mantenimientos/cAIHistorico"
+                      selected={
+                        location.pathname ===
+                        "/mantenimientos/cAIHistorico"
+                      }
+                    >
+                      <ListItemIcon>
+                        <History style={{ color: "white" }} />
+                      </ListItemIcon>
+                      <ListItemText primary="CAI Historico" />
+                    </ListItemButton>
+                  )}
               </List>
             </Collapse>
           </>

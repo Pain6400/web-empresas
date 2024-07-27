@@ -22,6 +22,7 @@ import TipoProducto from './pages/maintenance/TipoProducto'
 import Proveedores from './pages/maintenance/Proveedores'
 import ClasificacionProducto from './pages/maintenance/ClasificacionProducto'
 import Productos from './pages/maintenance/Productos'
+import CAIHistorico from './pages/maintenance/CAIHistorico'
 
 //
 import { UserProvider, UserContext } from './context/UserContext';
@@ -121,6 +122,7 @@ const AppContent = () => {
                 <Route path="/mantenimientos/proveedores" element={<PrivateRoute><Proveedores /></PrivateRoute>} />           
                 <Route path="/mantenimientos/clasificacionProducto" element={<PrivateRoute><ClasificacionProducto /></PrivateRoute>} />           
                 <Route path="/mantenimientos/productos" element={<PrivateRoute><Productos /></PrivateRoute>} />           
+                <Route path="/mantenimientos/cAIHistorico" element={<PrivateRoute><CAIHistorico /></PrivateRoute>} />           
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
