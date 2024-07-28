@@ -138,7 +138,11 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
   }, [producto]);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+      'image/gif': []
+    },
     onDrop: acceptedFiles => {
       setFoto(Object.assign(acceptedFiles[0], {
         preview: URL.createObjectURL(acceptedFiles[0])
