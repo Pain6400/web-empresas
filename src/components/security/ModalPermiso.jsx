@@ -23,7 +23,9 @@ const ModalPermiso = ({ open, handleClose, permiso, permisos, setPermisos }) => 
   const { setIsLoading } = useContext(LoadingContext);
 
   useEffect(() => {
-    if (permiso) {
+    setPermiso_id('');
+    setDescripcion('');
+    if (permiso !== null && permiso !== undefined) {
       setPermiso_id(permiso.permiso_id);
       setDescripcion(permiso.descripcion);
     } else {

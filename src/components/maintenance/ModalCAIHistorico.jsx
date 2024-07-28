@@ -14,6 +14,11 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import api from "../../components/axiosConfig";
 import GlobalAlert from "../../components/GlobalAlert";
 import Switch from "@mui/material/Switch";
+import dayjs from 'dayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
   const [formData, setFormData] = useState({
@@ -21,7 +26,7 @@ const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
     factura_desde: "",
     factura_hasta: "",
     ultima_factura_generada: "",
-    fecha_vigencia: "",
+    fecha_vigencia: dayjs(),
     estado: false,
   });
   const [errors, setErrors] = useState({});
@@ -34,7 +39,7 @@ const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
         factura_desde: cai.factura_desde,
         factura_hasta: cai.factura_hasta,
         ultima_factura_generada: cai.ultima_factura_generada,
-        fecha_vigencia: cai.fecha_vigencia,
+        fecha_vigencia: dayjs(cai.fecha_vigencia),
         estado: cai.estado == '1',
       });
     } else {
@@ -43,7 +48,7 @@ const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
         factura_desde: "",
         factura_hasta: "",
         ultima_factura_generada: "",
-        fecha_vigencia: "",
+        fecha_vigencia: dayjs(),
         estado: false,
       });
     }
@@ -54,6 +59,7 @@ const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  
   const handleSwitchChange = (e) => {
     setFormData((prev) => ({ ...prev, estado: e.target.checked }));
   };
@@ -133,6 +139,7 @@ const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
               error={Boolean(errors.cai)}
               helperText={errors.cai}
               sx={{ mt: 2 }}
+              disabled={formData.cai}
             />
           </Grid>
           <Grid item xs={6}>
@@ -175,16 +182,17 @@ const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
             />
           </Grid>
           <Grid item xs={6}>
-            <TextField
-              label="Fecha Vigencia"
-              name="fecha_vigencia"
-              value={formData.fecha_vigencia}
-              onChange={handleChange}
-              fullWidth
-              error={Boolean(errors.fecha_vigencia)}
-              helperText={errors.fecha_vigencia}
-              sx={{ mt: 2 }}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DemoContainer components={['DatePicker', 'DatePicker']}>
+                <DatePicker
+                  label="Fecha Vigencia"
+                  value={formData.fecha_vigencia}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mt: 2, pt: 1 }}
+                />
+              </DemoContainer>
+            </LocalizationProvider>
           </Grid>
           <Grid item xs={12}>
             <Box sx={{ mt: 2 }}>
@@ -203,11 +211,7 @@ const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
         <Button onClick={handleClose} color="primary">
           Cancelar
         </Button>
-        <LoadingButton
-          onClick={handleSubmit}
-          loading={loading}
-          color="primary"
-        >
+        <LoadingButton onClick={handleSubmit} loading={loading} color="primary">
           Guardar
         </LoadingButton>
       </DialogActions>

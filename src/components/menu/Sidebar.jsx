@@ -65,7 +65,7 @@ const Sidebar = () => {
       style={{
         width: "250px",
         background: "#0b40a8",
-        height: "100vh",
+        height: "150vh",
         color: "white",
       }}
     >
