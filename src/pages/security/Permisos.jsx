@@ -1,20 +1,42 @@
-import React, { useState, useEffect, useContext } from 'react';
-import api from '../../components/axiosConfig';
-import { Button, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
-import { Delete, Edit } from '@mui/icons-material';
-import GlobalAlert from '../../components/GlobalAlert';
-import ModalPermiso from '../../components/security/ModalPermiso'; // Assume you will create this modal similar to ModalPerfil
-import ModalUsuarioPermiso from '../../components/security/ModalUsuarioPermiso'; // Assume you will create this modal similar to ModalUsuarioPerfil
-import { LoadingContext } from '../../context/LoadingContext';
+import React, { useState, useEffect, useContext } from "react";
+import api from "../../components/axiosConfig";
+import {
+  Button,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Box,
+} from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
+import GlobalAlert from "../../components/GlobalAlert";
+import ModalPermiso from "../../components/security/ModalPermiso"; // Assume you will create this modal similar to ModalPerfil
+import ModalUsuarioPermiso from "../../components/security/ModalUsuarioPermiso"; // Assume you will create this modal similar to ModalUsuarioPerfil
+import { LoadingContext } from "../../context/LoadingContext";
+import { UserContext } from "../../context/UserContext";
 
 const Permisos = () => {
   const [permisos, setPermisos] = useState([]);
   const [selectedPermiso, setSelectedPermiso] = useState(null);
-  const [openPermisoModal, setOpenPermisoModal] = useState(false);;
+  const [openPermisoModal, setOpenPermisoModal] = useState(false);
   const [usuariosPermisos, setUsuariosPermisos] = useState([]);
   const [selectedUsuarioPermiso, setSelectedUsuarioPermiso] = useState(null);
   const [openUsuarioPermisoModal, setOpenUsuarioPermisoModal] = useState(false);
   const { setIsLoading } = useContext(LoadingContext);
+  const { user } = useContext(UserContext);
+
+  const hasRoles = (requiredRoles) => {
+    console.log(user.roles);
+    if (!user || !user.roles || user.roles.length === 0) {
+      return false;
+    }
+    return requiredRoles.some((rol) => user.roles.includes(rol));
+  };
 
   useEffect(() => {
     fetchPermisos();
@@ -22,20 +44,20 @@ const Permisos = () => {
   }, []);
 
   const fetchPermisos = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await api.get('/security/getPermisos');
+      const response = await api.get("/security/getPermisos");
       if (Array.isArray(response.data.permisos)) {
         setPermisos(response.data.permisos);
       } else {
-        GlobalAlert.showError('Error fetching permisos: Data is not an array');
+        GlobalAlert.showError("Error fetching permisos: Data is not an array");
       }
     } catch (error) {
       let response = error.response?.data ?? null;
-      if(response) {
-        GlobalAlert.showError('Error fetching permisos', response.message);
+      if (response) {
+        GlobalAlert.showError("Error fetching permisos", response.message);
       } else {
-        GlobalAlert.showError('Error logging in', error);
+        GlobalAlert.showError("Error logging in", error);
       }
     } finally {
       setIsLoading(false);
@@ -44,18 +66,20 @@ const Permisos = () => {
 
   const fetchUsuariosPermisos = async () => {
     try {
-      const response = await api.get('/security/getUsuariosPermisos');
+      const response = await api.get("/security/getUsuariosPermisos");
       if (Array.isArray(response.data.usuariosPermisos)) {
         setUsuariosPermisos(response.data.usuariosPermisos);
       } else {
-        GlobalAlert.showError('Error fetching perfil permisos: Data is not an array');
+        GlobalAlert.showError(
+          "Error fetching perfil permisos: Data is not an array"
+        );
       }
     } catch (error) {
       let response = error.response?.data ?? null;
-      if(response) {
-        GlobalAlert.showError('Error: ', response.message);
+      if (response) {
+        GlobalAlert.showError("Error: ", response.message);
       } else {
-        GlobalAlert.showError('Error: ', error);
+        GlobalAlert.showError("Error: ", error);
       }
     } finally {
       setIsLoading(false);
@@ -64,90 +88,150 @@ const Permisos = () => {
 
   const handleDeletePermiso = async (permiso_id) => {
     GlobalAlert.showWarning(
-      'Eliminar registro', 
-      'Esta seguro en eliminar el registro?',
+      "Eliminar registro",
+      "Esta seguro en eliminar el registro?",
       async () => {
         try {
           setIsLoading(true);
           await api.post(`/security/DeletePermiso/${permiso_id}`);
-          setPermisos(permisos.filter(permiso => permiso.permiso_id !== permiso_id));
-          GlobalAlert.showSuccess('Registro eliminado correctamente');
+          setPermisos(
+            permisos.filter((permiso) => permiso.permiso_id !== permiso_id)
+          );
+          GlobalAlert.showSuccess("Registro eliminado correctamente");
         } catch (error) {
           let response = error.response?.data ?? null;
-          if(response) {
-            GlobalAlert.showError('Error: ', response.message);
+          if (response) {
+            GlobalAlert.showError("Error: ", response.message);
           } else {
-            GlobalAlert.showError('Error: ', error);
+            GlobalAlert.showError("Error: ", error);
           }
         } finally {
           setIsLoading(false);
         }
-      }  
-    )
+      }
+    );
   };
 
   const handleDeleteUsuarioPermiso = async (usuarioId, permisoId) => {
     GlobalAlert.showWarning(
-      'Eliminar registro', 
-      'Esta seguro en eliminar el registro?',
+      "Eliminar registro",
+      "Esta seguro en eliminar el registro?",
       async () => {
         try {
           setIsLoading(true);
-          await api.post(`/security/DeleteUsuarioPermiso/${permisoId}/${usuarioId}`);
-          setUsuariosPermisos(usuariosPermisos.filter(usuarioPermiso => !(usuarioPermiso.usuario_id === usuarioId && usuarioPermiso.permiso_id === permisoId)));
-          GlobalAlert.showSuccess('Registro eliminado correctamente');
+          await api.post(
+            `/security/DeleteUsuarioPermiso/${permisoId}/${usuarioId}`
+          );
+          setUsuariosPermisos(
+            usuariosPermisos.filter(
+              (usuarioPermiso) =>
+                !(
+                  usuarioPermiso.usuario_id === usuarioId &&
+                  usuarioPermiso.permiso_id === permisoId
+                )
+            )
+          );
+          GlobalAlert.showSuccess("Registro eliminado correctamente");
         } catch (error) {
           let response = error.response?.data ?? null;
-          if(response) {
-            GlobalAlert.showError('Error: ', response.message);
+          if (response) {
+            GlobalAlert.showError("Error: ", response.message);
           } else {
-            GlobalAlert.showError('Error: ', error);
+            GlobalAlert.showError("Error: ", error);
           }
         } finally {
           setIsLoading(false);
         }
-      }  
-    )
+      }
+    );
   };
   return (
     <div>
-      <Box sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Permisos</Typography>
-        <Button variant="contained" color="primary" onClick={() => { setSelectedPermiso(null); setOpenPermisoModal(true); }}>
-          Crear
-        </Button>
-      </Box>
-      <TableContainer component={Paper} style={{ marginBottom: '2rem' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Permiso ID</TableCell>
-              <TableCell>Descripción</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.isArray(permisos) && permisos.map((permiso) => (
-              <TableRow key={permiso.permiso_id}>
-                <TableCell>{permiso.permiso_id}</TableCell>
-                <TableCell>{permiso.descripcion}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => { setSelectedPermiso(permiso); setOpenPermisoModal(true); }}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeletePermiso(permiso.permiso_id)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {hasRoles(["SuperAdmin"]) && (
+        <>
+          <Box
+            sx={{
+              backgroundColor: "primary.main",
+              color: "primary.contrastText",
+              padding: "16px",
+              marginBottom: "16px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h5">Permisos</Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setSelectedPermiso(null);
+                setOpenPermisoModal(true);
+              }}
+            >
+              Crear
+            </Button>
+          </Box>
+          <TableContainer component={Paper} style={{ marginBottom: "2rem" }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Permiso ID</TableCell>
+                  <TableCell>Descripción</TableCell>
+                  <TableCell>Acciones</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array.isArray(permisos) &&
+                  permisos.map((permiso) => (
+                    <TableRow key={permiso.permiso_id}>
+                      <TableCell>{permiso.permiso_id}</TableCell>
+                      <TableCell>{permiso.descripcion}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={() => {
+                            setSelectedPermiso(permiso);
+                            setOpenPermisoModal(true);
+                          }}
+                        >
+                          <Edit />
+                        </IconButton>
+                        <IconButton
+                          onClick={() =>
+                            handleDeletePermiso(permiso.permiso_id)
+                          }
+                        >
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
 
-      <Box sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          backgroundColor: "primary.main",
+          color: "primary.contrastText",
+          padding: "16px",
+          marginBottom: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Typography variant="h5">Usuarios Permisos</Typography>
-        <Button variant="contained" color="primary" onClick={() => { setSelectedUsuarioPermiso(null); setOpenUsuarioPermisoModal(true); }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            setSelectedUsuarioPermiso(null);
+            setOpenUsuarioPermisoModal(true);
+          }}
+        >
           Crear
         </Button>
       </Box>
@@ -161,17 +245,27 @@ const Permisos = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(usuariosPermisos) && usuariosPermisos.map((usuarioPermiso) => (
-              <TableRow key={`${usuarioPermiso.usuario_id}-${usuarioPermiso.permiso_id}`}>
-                <TableCell>{usuarioPermiso.nombre}</TableCell>
-                <TableCell>{usuarioPermiso.descripcion}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleDeleteUsuarioPermiso(usuarioPermiso.usuario_id, usuarioPermiso.permiso_id)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {Array.isArray(usuariosPermisos) &&
+              usuariosPermisos.map((usuarioPermiso) => (
+                <TableRow
+                  key={`${usuarioPermiso.usuario_id}-${usuarioPermiso.permiso_id}`}
+                >
+                  <TableCell>{usuarioPermiso.nombre}</TableCell>
+                  <TableCell>{usuarioPermiso.descripcion}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick={() =>
+                        handleDeleteUsuarioPermiso(
+                          usuarioPermiso.usuario_id,
+                          usuarioPermiso.permiso_id
+                        )
+                      }
+                    >
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -188,7 +282,7 @@ const Permisos = () => {
         usuarioPermiso={selectedUsuarioPermiso}
         usuariosPermisos={usuariosPermisos}
         setUsuariosPermisos={setUsuariosPermisos}
-      /> 
+      />
     </div>
   );
 };

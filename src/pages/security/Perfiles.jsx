@@ -6,6 +6,7 @@ import GlobalAlert from '../../components/GlobalAlert';
 import ModalPerfil from '../../components/security/ModalPerfil';
 import ModalUsuarioPerfil from '../../components/security/ModalUsuarioPerfil';
 import { LoadingContext } from '../../context/LoadingContext';
+import { UserContext } from '../../context/UserContext';
 
 const Perfiles = () => {
   const [perfiles, setPerfiles] = useState([]);
@@ -15,6 +16,16 @@ const Perfiles = () => {
   const [openPerfilModal, setOpenPerfilModal] = useState(false);
   const [openUsuarioPerfilModal, setOpenUsuarioPerfilModal] = useState(false);
   const { setIsLoading } = useContext(LoadingContext);
+  const { user } = useContext(UserContext);
+  
+  const hasRoles = (requiredRoles) => {
+    console.log(user.roles )
+    if (!user || !user.roles || user.roles.length === 0) {
+      return false;
+    }
+    return requiredRoles.some(rol => user.roles.includes(rol));
+  };
+
   useEffect(() => {
     fetchPerfiles();
     fetchUserProfiles();
@@ -111,43 +122,90 @@ const Perfiles = () => {
 
   return (
     <div>
-      <Box sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Perfiles</Typography>
-        <Button variant="contained" color="primary" onClick={() => { setSelectedPerfil(null); setOpenPerfilModal(true); }}>
-          Crear
-        </Button>
-      </Box>
-      <TableContainer component={Paper} style={{ marginBottom: '2rem' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Perfil ID</TableCell>
-              <TableCell>Descripción</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.isArray(perfiles) && perfiles.map((perfil) => (
-              <TableRow key={perfil.perfil_id}>
-                <TableCell>{perfil.perfil_id}</TableCell>
-                <TableCell>{perfil.descripcion}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => { setSelectedPerfil(perfil); setOpenPerfilModal(true); }}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeletePerfil(perfil.perfil_id)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {hasRoles(["SuperAdmin"]) && (
+        <>
+          <Box
+            sx={{
+              backgroundColor: "primary.main",
+              color: "primary.contrastText",
+              padding: "16px",
+              marginBottom: "16px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h5">Perfiles</Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setSelectedPerfil(null);
+                setOpenPerfilModal(true);
+              }}
+            >
+              Crear
+            </Button>
+          </Box>
 
-      <Box sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText', padding: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <TableContainer component={Paper} style={{ marginBottom: "2rem" }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Perfil ID</TableCell>
+                  <TableCell>Descripción</TableCell>
+                  <TableCell>Acciones</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array.isArray(perfiles) &&
+                  perfiles.map((perfil) => (
+                    <TableRow key={perfil.perfil_id}>
+                      <TableCell>{perfil.perfil_id}</TableCell>
+                      <TableCell>{perfil.descripcion}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={() => {
+                            setSelectedPerfil(perfil);
+                            setOpenPerfilModal(true);
+                          }}
+                        >
+                          <Edit />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDeletePerfil(perfil.perfil_id)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
+      
+      <Box
+        sx={{
+          backgroundColor: "primary.main",
+          color: "primary.contrastText",
+          padding: "16px",
+          marginBottom: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Typography variant="h5">Usuarios Perfiles</Typography>
-        <Button variant="contained" color="primary" onClick={() => { setSelectedUsuarioPerfil(null); setOpenUsuarioPerfilModal(true); }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            setSelectedUsuarioPerfil(null);
+            setOpenUsuarioPerfilModal(true);
+          }}
+        >
           Crear
         </Button>
       </Box>
@@ -161,17 +219,27 @@ const Perfiles = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(userProfiles) && userProfiles.map((userProfile) => (
-              <TableRow key={`${userProfile.usuario_id}-${userProfile.perfil_id}`}>
-                <TableCell>{userProfile.nombre}</TableCell>
-                <TableCell>{userProfile.descripcion}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleDeleteUsuarioPerfil(userProfile.usuario_id, userProfile.perfil_id)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {Array.isArray(userProfiles) &&
+              userProfiles.map((userProfile, index) => (
+                <TableRow
+                  key={`${userProfile.usuario_id}-${userProfile.perfil_id}-${index}`}
+                >
+                  <TableCell>{userProfile.nombre}</TableCell>
+                  <TableCell>{userProfile.descripcion}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick={() =>
+                        handleDeleteUsuarioPerfil(
+                          userProfile.usuario_id,
+                          userProfile.perfil_id
+                        )
+                      }
+                    >
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
