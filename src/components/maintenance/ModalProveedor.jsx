@@ -10,6 +10,10 @@ import {
   Divider,
   Grid,
   FormControlLabel,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel,
   Switch,
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -33,6 +37,16 @@ const ModalProveedor = ({ open, handleClose, proveedor, setReload }) => {
   const [comentarios, setComentarios] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const tipos = [
+    {
+      proveedorTipo: 'N',
+      nombre: 'Natural'
+    },
+    {
+      proveedorTipo: 'J',
+      nombre: 'Judicial'
+    }
+  ];
 
   useEffect(() => {
     if (proveedor) {
@@ -169,16 +183,21 @@ const ModalProveedor = ({ open, handleClose, proveedor, setReload }) => {
             />
           </Grid>
           <Grid item xs={6}>
-            <TextField
-              label="Tipo de Proveedor"
-              value={proveedorTipo}
-              onChange={(e) => setProveedorTipo(e.target.value)}
-              fullWidth
-              error={Boolean(errors.proveedorTipo)}
-              helperText={errors.proveedorTipo}
-              sx={{ mt: 2 }}
-            />
-          </Grid>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <InputLabel>Tipo Proveedor</InputLabel>
+                <Select
+                  value={proveedorTipo}
+                  onChange={(e) => setProveedorTipo(e.target.value)}
+                  error={Boolean(errors.proveedorTipo)}
+                >
+                  {tipos.map((tipo) => (
+                    <MenuItem key={tipo.proveedorTipo} value={tipo.proveedorTipo}>
+                      {tipo.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           <Grid item xs={6}>
             <TextField
               label="RTN"
@@ -210,6 +229,7 @@ const ModalProveedor = ({ open, handleClose, proveedor, setReload }) => {
               error={Boolean(errors.telefono)}
               helperText={errors.telefono}
               sx={{ mt: 2 }}
+              type="number"
             />
           </Grid>
           <Grid item xs={6}>
@@ -252,6 +272,7 @@ const ModalProveedor = ({ open, handleClose, proveedor, setReload }) => {
               onChange={(e) => setFormaPago(e.target.value)}
               fullWidth
               sx={{ mt: 2 }}
+              type="number"
             />
           </Grid>
           <Grid item xs={6}>
@@ -261,6 +282,7 @@ const ModalProveedor = ({ open, handleClose, proveedor, setReload }) => {
               onChange={(e) => setSaldo(e.target.value)}
               fullWidth
               sx={{ mt: 2 }}
+              type="number"
             />
           </Grid>
           <Grid item xs={6}>
@@ -270,6 +292,7 @@ const ModalProveedor = ({ open, handleClose, proveedor, setReload }) => {
               onChange={(e) => setLimiteCredito(e.target.value)}
               fullWidth
               sx={{ mt: 2 }}
+              type="number"
             />
           </Grid>
           <Grid item xs={12}>

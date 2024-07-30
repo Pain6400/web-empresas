@@ -209,9 +209,6 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
       validationErrors.especificaciones =
         "Las especificaciones son obligatorias";
     }
-    if (!costoPromedio) {
-      validationErrors.costo_promedio = "El costo promedio es obligatorio";
-    }
     if (!precioSinImpuesto) {
       validationErrors.precio_sin_impuesto =
         "El precio sin impuesto es obligatorio";
@@ -223,10 +220,6 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
     if (!porcentajeComision) {
       validationErrors.porcentaje_comision =
         "El porcentaje de comisión es obligatorio";
-    }
-    if (!existenciaGlobal) {
-      validationErrors.existencia_global =
-        "La existencia global es obligatoria";
     }
     if (!stockMinimo) {
       validationErrors.stock_minimo = "El stock mínimo es obligatorio";
@@ -246,12 +239,12 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
         formData.append("especificaciones", especificaciones);
         formData.append("foto", foto);
         formData.append("exento", exento);
-        formData.append("costo_promedio", costoPromedio);
+        formData.append("costo_promedio", costoPromedio !== '' ? parseFloat(costoPromedio) : null);
         formData.append("precio_sin_impuesto", precioSinImpuesto);
         formData.append("precio_con_impuesto", precioConImpuesto);
         formData.append("aplica_descuento", aplicaDescuento);
         formData.append("porcentaje_comision", porcentajeComision);
-        formData.append("existencia_global", existenciaGlobal);
+        formData.append("existencia_global", existenciaGlobal !== '' ? parseFloat(existenciaGlobal) : null);
         formData.append("stock_minimo", stockMinimo);
         formData.append("estado", estado);
 
@@ -413,8 +406,6 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               label="Costo Promedio"
               value={costoPromedio}
               onChange={(e) => setCostoPromedio(e.target.value)}
-              error={Boolean(errors.costo_promedio)}
-              helperText={errors.costo_promedio}
               type="number"
             />
           </Grid>
@@ -471,8 +462,6 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               label="Existencia Global"
               value={existenciaGlobal}
               onChange={(e) => setExistenciaGlobal(e.target.value)}
-              error={Boolean(errors.existencia_global)}
-              helperText={errors.existencia_global}
               type="number"
             />
           </Grid>
@@ -484,6 +473,7 @@ const ModalProducto = ({ open, handleClose, producto, setReload }) => {
               onChange={(e) => setStockMinimo(e.target.value)}
               error={Boolean(errors.stock_minimo)}
               helperText={errors.stock_minimo}
+              type="number"
             />
           </Grid>
           {producto && (
