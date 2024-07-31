@@ -139,7 +139,7 @@ const ModalCAIHistorico = ({ open, handleClose, cai, setReload }) => {
               error={Boolean(errors.cai)}
               helperText={errors.cai}
               sx={{ mt: 2 }}
-              disabled={formData.cai}
+              disabled={Boolean(cai)}
             />
           </Grid>
           <Grid item xs={6}>
