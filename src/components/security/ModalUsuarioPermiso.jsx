@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Modal, Box, Button, Divider, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Modal, Box, Button, Divider, FormControlLabel, Checkbox, FormGroup, FormControl, InputLabel, Select, MenuItem  } from '@mui/material';
 import api from '../../components/axiosConfig';
 import GlobalAlert from '../../components/GlobalAlert';
 import { LoadingContext } from '../../context/LoadingContext';
@@ -18,7 +18,7 @@ const style = {
 
 const ModalUsuarioPermiso = ({ open, handleClose, usuarioPermiso, usuariosPermisos, setUsuariosPermisos }) => {
   const [usuarioId, setUsuarioId] = useState('');
-  const [permisoId, setPermisoId] = useState('');
+  const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const [errors, setErrors] = useState({});
@@ -46,8 +46,16 @@ const ModalUsuarioPermiso = ({ open, handleClose, usuarioPermiso, usuariosPermis
     fetchUsuarios();
     fetchPermisos();
     setUsuarioId('');
-    setPermisoId('');
+    setSelectedPermisos([]);
   }, []);
+
+  const handlePermisoChange = (permisoId) => {
+    setSelectedPermisos((prevSelected) => 
+      prevSelected.includes(permisoId) 
+        ? prevSelected.filter((id) => id !== permisoId) 
+        : [...prevSelected, permisoId]
+    );
+  };
 
   const handleSubmit = async () => {
     const validationErrors = {};
@@ -55,28 +63,38 @@ const ModalUsuarioPermiso = ({ open, handleClose, usuarioPermiso, usuariosPermis
     if (!usuarioId) {
       validationErrors.usuarioId = 'El usuario es obligatorio';
     }
-    if (!permisoId) {
-      validationErrors.permisoId = 'El permiso es obligatorio';
+    if (selectedPermisos.length === 0) {
+      validationErrors.permisoId = 'Al menos un permiso es obligatorio';
     }
 
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true);
-        let path = '/security/createUsuarioPermiso';
-        const response = await api.post(path, {
-          usuarioId,
-          permisoId
-        });
+        for (const permisoId of selectedPermisos) {
+          let path = '/security/createUsuarioPermiso';
+          const response = await api.post(path, {
+            usuarioId,
+            permisoId
+          });
 
-        if (response.data.status) {
-          handleClose();
-          let permiso = permisos.find(p => p.permiso_id === permisoId);
-          let usuario = usuarios.find(u => u.usuario_id === usuarioId);
-          setUsuariosPermisos([...usuariosPermisos, { usuario_id: usuarioId, permiso_id: permisoId, nombre: usuario.nombre, descripcion: permiso.descripcion }]);
-          GlobalAlert.showSuccess('Registro creado correctamente');
-        } else {
-          GlobalAlert.showError('Error: ', response.data.message);
+          if (response.data.status) {
+            let permiso = permisos.find(p => p.permiso_id === permisoId);
+            let usuario = usuarios.find(u => u.usuario_id === usuarioId);
+            setUsuariosPermisos(prevState => [
+              ...prevState, 
+              { 
+                usuario_id: usuarioId, 
+                permiso_id: permisoId, 
+                nombre: usuario.nombre, 
+                descripcion: permiso.descripcion 
+              }
+            ]);
+          } else {
+            GlobalAlert.showError('Error: ', response.data.message);
+          }
         }
+        GlobalAlert.showSuccess('Registro(s) creado(s) correctamente');
+        handleClose();
       } catch (error) {
         let response = error.response?.data ?? null;
         if (response) {
@@ -113,18 +131,20 @@ const ModalUsuarioPermiso = ({ open, handleClose, usuarioPermiso, usuariosPermis
           {errors.usuarioId && <p style={{ color: 'red' }}>{errors.usuarioId}</p>}
         </FormControl>
         <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>Permiso ID</InputLabel>
-          <Select
-            value={permisoId}
-            onChange={(e) => setPermisoId(e.target.value)}
-            error={Boolean(errors.permisoId)}
-          >
+          <FormGroup>
             {permisos.map((permiso) => (
-              <MenuItem key={permiso.permiso_id} value={permiso.permiso_id}>
-                {permiso.descripcion}
-              </MenuItem>
+              <FormControlLabel
+                key={permiso.permiso_id}
+                control={
+                  <Checkbox
+                    checked={selectedPermisos.includes(permiso.permiso_id)}
+                    onChange={() => handlePermisoChange(permiso.permiso_id)}
+                  />
+                }
+                label={permiso.descripcion}
+              />
             ))}
-          </Select>
+          </FormGroup>
           {errors.permisoId && <p style={{ color: 'red' }}>{errors.permisoId}</p>}
         </FormControl>
         <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ mt: 2 }}>

@@ -31,7 +31,6 @@ const Permisos = () => {
   const { user } = useContext(UserContext);
 
   const hasRoles = (requiredRoles) => {
-    console.log(user.roles);
     if (!user || !user.roles || user.roles.length === 0) {
       return false;
     }
