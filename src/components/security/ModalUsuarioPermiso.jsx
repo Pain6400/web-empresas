@@ -16,7 +16,7 @@ const style = {
   p: 4,
 };
 
-const ModalUsuarioPermiso = ({ open, handleClose, usuarioPermiso, usuariosPermisos, setUsuariosPermisos }) => {
+const ModalUsuarioPermiso = ({ open, handleClose, usuarioPermiso, setReload }) => {
   const [usuarioId, setUsuarioId] = useState('');
   const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -74,22 +74,14 @@ const ModalUsuarioPermiso = ({ open, handleClose, usuarioPermiso, usuariosPermis
           let path = '/security/createUsuarioPermiso';
           const response = await api.post(path, {
             usuarioId,
-            permisoId
+            permisos: selectedPermisos // Enviamos el array de permisos
           });
-
+    
           if (response.data.status) {
-            let permiso = permisos.find(p => p.permiso_id === permisoId);
-            let usuario = usuarios.find(u => u.usuario_id === usuarioId);
-            setUsuariosPermisos(prevState => [
-              ...prevState, 
-              { 
-                usuario_id: usuarioId, 
-                permiso_id: permisoId, 
-                nombre: usuario.nombre, 
-                descripcion: permiso.descripcion 
-              }
-            ]);
-          } else {
+            handleClose();
+            setReload(true);
+            GlobalAlert.showSuccess('Registros creados correctamente');
+          }  else {
             GlobalAlert.showError('Error: ', response.data.message);
           }
         }

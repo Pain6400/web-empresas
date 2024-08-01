@@ -27,6 +27,7 @@ const Permisos = () => {
   const [usuariosPermisos, setUsuariosPermisos] = useState([]);
   const [selectedUsuarioPermiso, setSelectedUsuarioPermiso] = useState(null);
   const [openUsuarioPermisoModal, setOpenUsuarioPermisoModal] = useState(false);
+  const [reload, setReload] = useState(false);
   const { setIsLoading } = useContext(LoadingContext);
   const { user } = useContext(UserContext);
 
@@ -40,7 +41,9 @@ const Permisos = () => {
   useEffect(() => {
     fetchPermisos();
     fetchUsuariosPermisos();
-  }, []);
+
+    setReload(false);
+  }, [reload]);
 
   const fetchPermisos = async () => {
     setIsLoading(true);
@@ -279,8 +282,7 @@ const Permisos = () => {
         open={openUsuarioPermisoModal}
         handleClose={() => setOpenUsuarioPermisoModal(false)}
         usuarioPermiso={selectedUsuarioPermiso}
-        usuariosPermisos={usuariosPermisos}
-        setUsuariosPermisos={setUsuariosPermisos}
+        setReload={setReload}
       />
     </div>
   );
